@@ -51,7 +51,7 @@ void findZeroPiece(int& outRow, int& outCol, int** grid, const int& n)
 
 // Function for moving piece down INTO the 0 spot
 // Returns false if the operation was unsuccessful
-bool movePieceDown(int** grid, int n)
+bool movePieceDown(int** grid, const int& n)
 {
 	// Find 0 "piece" (technically blank spot)
     int row = 0;
@@ -71,7 +71,7 @@ bool movePieceDown(int** grid, int n)
 
 // Function for moving piece up INTO the 0 spot
 // Returns false if the operation was unsuccessful
-bool movePieceUp(int** grid, int n)
+bool movePieceUp(int** grid, const int& n)
 {
 	// Find 0 "piece" (technically blank spot)
 	int row = 0;
@@ -91,7 +91,7 @@ bool movePieceUp(int** grid, int n)
 
 // Function for moving piece left INTO the 0 spot
 // Returns false if the operation was unsuccessful
-bool movePieceLeft(int** grid, int n)
+bool movePieceLeft(int** grid, const int& n)
 {
 	// Find 0 "piece" (technically blank spot)
 	int row = 0;
@@ -111,7 +111,7 @@ bool movePieceLeft(int** grid, int n)
 
 // Function for moving piece right INTO the 0 spot
 // Returns false if the operation was unsuccessful
-bool movePieceRight(int** grid, int n)
+bool movePieceRight(int** grid, const int& n)
 {
 	// Find 0 "piece" (technically blank spot)
 	int row = 0;
@@ -179,6 +179,11 @@ void printQueue(std::priority_queue < Node, std::vector<Node>, decltype(costComp
 		std::cout << pq.top().cost;
 		pq.pop();
 	}
+}
+
+void printGrid(int** grid, const int& n)
+{
+
 }
 
 int main()
@@ -280,17 +285,16 @@ int main()
 	}
 
 	std::cout << std::endl;
+	
+	const int numOfOperators = 4;	// Up, down, left, right
+	std::function<void(int**, int)>* operatorList = new std::function<void(int**, int)>[numOfOperators];
+	operatorList[0] = movePieceDown;
+	operatorList[1] = movePieceUp;
+	operatorList[2] = movePieceLeft;
+	operatorList[3] = movePieceRight;
 
-	std::cout << "Initial grid after operation:\n";
+	Problem problem(initialGridPtr, solvedGrid, operatorList);
+	// generalSearch with queueing function that takes operators...
 
-	for (int i = 0; i < n; ++i)
-	{
-		for (int j = 0; j < n; ++j)
-		{
-			std::cout << initialGridPtr[i][j] << '\t';
-		}
-		std::cout << std::endl;
-	}
-
-	std::cout << std::endl;
+	// @TODO: Deallocate all resources
 }
