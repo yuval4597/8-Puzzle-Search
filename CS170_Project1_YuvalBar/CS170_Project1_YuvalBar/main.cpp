@@ -10,7 +10,13 @@ struct Problem
 {
     int** initialState;
     int** goalState;
-    int* operators;
+    std::function<void(int**, int)>* operators;
+
+    Problem(int** inInitialState, int** inGoalState, std::function<void(int**, int)>* inOperators) :
+        initialState(inInitialState),
+        goalState(inGoalState),
+        operators(inOperators)
+    {}
 };
 
 struct Node
@@ -18,18 +24,122 @@ struct Node
     int** state;
     int cost = 0;
 
-    Node(int inCost) : cost(inCost) {}
+    Node(int inCost, int** inState) : 
+        cost(inCost),
+        state(inState)
+    {}
 };
 
-// General search algorithm suggested by Dr. Keogh
-void generalSearch(Problem problem, const std::function<void()>& queueingFunction)
+void findZeroPiece(int& outRow, int& outCol, int** grid, const int& n)
 {
-    // Comparison lambda for prioritizing nodes
-	auto costComparisonLambda = [](Node a, Node b) { return a.cost > b.cost; };
+    outRow = 0;
+    outCol = 0;
+
+	for (int i = 0; i < n; ++i)
+	{
+		for (int j = 0; j < n; ++j)
+		{
+			if (grid[i][j] == 0)
+			{
+                outRow = i;
+                outCol = j;
+				return;
+			}
+		}
+	}
+}
+
+// Function for moving piece down INTO the 0 spot
+// Returns false if the operation was unsuccessful
+bool movePieceDown(int** grid, int n)
+{
+	// Find 0 "piece" (technically blank spot)
+    int row = 0;
+    int col = 0;
+
+    findZeroPiece(row, col, grid, n);
+
+    if (row == 0)
+    {
+        // Cannot move piece down into 0 spot if it is already at the topmost row
+        return false;
+    }
+
+    std::swap(grid[row][col], grid[row - 1][col]);
+	return true;
+}
+
+// Function for moving piece up INTO the 0 spot
+// Returns false if the operation was unsuccessful
+bool movePieceUp(int** grid, int n)
+{
+	// Find 0 "piece" (technically blank spot)
+	int row = 0;
+	int col = 0;
+
+	findZeroPiece(row, col, grid, n);
+
+	if (row == n - 1)
+	{
+		// Cannot move piece up into 0 spot if it is already at the bottommost row
+		return false;
+	}
+
+	std::swap(grid[row][col], grid[row + 1][col]);
+	return true;
+}
+
+// Function for moving piece left INTO the 0 spot
+// Returns false if the operation was unsuccessful
+bool movePieceLeft(int** grid, int n)
+{
+	// Find 0 "piece" (technically blank spot)
+	int row = 0;
+	int col = 0;
+
+	findZeroPiece(row, col, grid, n);
+
+	if (col == n - 1)
+	{
+		// Cannot move piece left into 0 spot if it is already at the rightmost column
+		return false;
+	}
+
+	std::swap(grid[row][col], grid[row][col + 1]);
+	return true;
+}
+
+// Function for moving piece right INTO the 0 spot
+// Returns false if the operation was unsuccessful
+bool movePieceRight(int** grid, int n)
+{
+	// Find 0 "piece" (technically blank spot)
+	int row = 0;
+	int col = 0;
+
+	findZeroPiece(row, col, grid, n);
+
+	if (col == 0)
+	{
+		// Cannot move piece right into 0 spot if it is already at the leftmost column
+		return false;
+	}
+
+	std::swap(grid[row][col], grid[row][col - 1]);
+	return true;
+}
+
+// Comparison lambda for prioritizing nodes
+auto costComparisonLambda = [](Node a, Node b) { return a.cost > b.cost; };
+
+// General search algorithm suggested by Dr. Keogh
+void generalSearch(Problem problem, const std::function<void(std::priority_queue < Node, std::vector<Node>, decltype(costComparisonLambda) >&)>& queueingFunction)
+{
 	std::priority_queue<Node, std::vector<Node>, decltype(costComparisonLambda)> nodes(costComparisonLambda);
 
     // Initialize priority queue with initial state
-    nodes.push(problem.initialState);
+    const Node initialNode(0, problem.initialState);
+    nodes.push(initialNode);
 
     // Keep looping until hit one of the return statements (or run out of memory :P)
     while (1)
@@ -50,7 +160,25 @@ void generalSearch(Problem problem, const std::function<void()>& queueingFunctio
             std::cout << "temp message: success\n";
             return;
         }
+
+        queueingFunction(nodes);
     }
+}
+
+void pushQueue(std::priority_queue < Node, std::vector<Node>, decltype(costComparisonLambda) >& pq)
+{
+	pq.push(Node(2, nullptr));
+	pq.push(Node(4, nullptr));
+	pq.push(Node(3, nullptr));
+}
+
+void printQueue(std::priority_queue < Node, std::vector<Node>, decltype(costComparisonLambda) > pq)
+{
+	while (!pq.empty())
+	{
+		std::cout << pq.top().cost;
+		pq.pop();
+	}
 }
 
 int main()
@@ -95,4 +223,74 @@ int main()
 // 
 //     std::cout << "All done!\n";
 //     std::cout << "Over.\n";
+
+    // n is the number of rows/columns (must be a square grid)
+    const int n = 3;
+
+	int** solvedGrid = new int* [n];
+	for (auto i = 0; i < n; ++i)
+	{
+		solvedGrid[i] = new int[n];
+	}
+
+    std::cout << "Solved grid:\n";
+
+	for (int i = 0; i < n; ++i)
+	{
+		for (int j = 0; j < n; ++j)
+		{
+            if (i == n - 1 && j == n - 1)
+            {
+                solvedGrid[i][j] = 0;
+            }
+            else
+            {
+                solvedGrid[i][j] = (i * n) + j + 1;
+            }
+			
+            std::cout << solvedGrid[i][j] << '\t';
+		}
+        std::cout << std::endl;
+	}
+
+    std::cout << std::endl;
+
+    int initialGrid[][3] = {
+        {6,3,7},
+        {4,8,5},
+        {1,2,0}
+    };
+
+	int** initialGridPtr = new int* [n];
+	for (auto i = 0; i < n; ++i)
+	{
+        initialGridPtr[i] = new int[n];
+	}
+
+	std::cout << "initial grid ptr:\n";
+
+	for (int i = 0; i < n; ++i)
+	{
+		for (int j = 0; j < n; ++j)
+		{
+            initialGridPtr[i][j] = initialGrid[i][j];
+			std::cout << initialGridPtr[i][j] << '\t';
+		}
+		std::cout << std::endl;
+	}
+
+	std::cout << std::endl;
+
+	std::cout << "Initial grid after operation:\n";
+
+	for (int i = 0; i < n; ++i)
+	{
+		for (int j = 0; j < n; ++j)
+		{
+			std::cout << initialGridPtr[i][j] << '\t';
+		}
+		std::cout << std::endl;
+	}
+
+	std::cout << std::endl;
 }
