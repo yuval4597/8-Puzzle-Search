@@ -23,6 +23,7 @@ struct Node
 {
     int** state;
     int cost = 0;
+	Node* parent = nullptr;
 
     Node(int inCost, int** inState) : 
         cost(inCost),
@@ -130,15 +131,148 @@ bool movePieceRight(int** grid, const int& n)
 }
 
 // Comparison lambda for prioritizing nodes
-auto costComparisonLambda = [](Node a, Node b) { return a.cost > b.cost; };
+auto costComparisonLambda = [](Node* a, Node* b) { return a->cost > b->cost; };
+
+int** copyGrid(int** state, const int& n)
+{
+	int** res = new int* [n];
+	for (auto i = 0; i < n; ++i)
+	{
+		res[i] = new int[n];
+		for (auto j = 0; j < n; ++j)
+		{
+			res[i][j] = state[i][j];
+		}
+	}
+
+	return res;
+}
+
+void printGrid(int** grid, const int& n)
+{
+	for (auto i = 0; i < n; ++i)
+	{
+		for (auto j = 0; j < n; ++j)
+		{
+			std::cout << grid[i][j] << '\t';
+		}
+		std::cout << std::endl;
+	}
+}
+
+std::vector<int**> exploredGrids;
+
+bool wasGridExplored(int** grid, int n)
+{
+	if (exploredGrids.empty())
+	{
+		return false;
+	}
+
+	for (auto exploredGrid : exploredGrids)
+	{
+		bool isMatch = true;
+		for (auto i = 0; i < n; ++i)
+		{
+			for (auto j = 0; j < n; ++j)
+			{
+				if (grid[i][j] != exploredGrid[i][j])
+				{
+					isMatch = false;
+					break;
+				}
+			}
+			
+			if (!isMatch)
+			{
+				break;
+			}
+		}
+
+		if (isMatch)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+void uniformCostSearch(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::function<void(int**, int)>* inOperators)
+{
+	// @TODO: Keep track of explored nodes
+
+	if (outNodes.empty())
+	{
+		return;
+	}
+
+	Node* currentNode = outNodes.top();
+	exploredGrids.push_back(copyGrid(currentNode->state, 3));	// @TODO: Hardcoded value of n
+
+	for (auto i = 0; i < 4; ++i)	// @TODO: Hardcoded value of numOfOperators
+	{
+		int** copiedState = copyGrid(currentNode->state, 3);	// @TODO: Hardcoded value of n
+		Node* newNode = new Node(currentNode->cost + 1, copiedState);
+		newNode->parent = currentNode;
+// 		std::cout << "New node before inOperator" << i << std::endl;
+// 		printGrid(newNode->state, 3);
+
+		inOperators[i](newNode->state, 3);	// @TODO: Hardcoded value of n
+
+// 		std::cout << "\nNew node after inOperator" << i << std::endl;
+// 		printGrid(newNode->state, 3);
+// 		std::cout << std::endl;
+
+		if (!wasGridExplored(copiedState, 3))	// @TODO: Hardcoded value of n
+		{
+			outNodes.push(newNode);
+		}
+	}
+
+	std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) > pq(outNodes);
+	
+	/*std::cout << "Current nodes in queue:\n";*/
+	while (!pq.empty())
+	{
+// 		for (int i = 0; i < 3; ++i)		// @TODO: Hardcoded n value, should be a print function anyway...
+// 		{
+// 			for (int j = 0; j < 3; ++j)	// @TODO: Hardcoded n value, should be a print function anyway...
+// 			{
+// 				std::cout << pq.top()->state[i][j] << '\t';
+// 			}
+// 			std::cout << std::endl;
+// 		}
+// 
+// 		std::cout << std::endl;
+
+		pq.pop();
+	}
+}
+
+bool isGoalState(int** grid, int** goal, const int& n)
+{
+	for (auto i = 0; i < n; ++i)
+	{
+		for (auto j = 0; j < n; ++j)
+		{
+			if (grid[i][j] != goal[i][j])
+			{
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
 
 // General search algorithm suggested by Dr. Keogh
-void generalSearch(Problem problem, const std::function<void(std::priority_queue < Node, std::vector<Node>, decltype(costComparisonLambda) >&)>& queueingFunction)
+void generalSearch(Problem problem, const std::function<void(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >&, std::function<void(int**, int)>*)>& queueingFunction)
 {
-	std::priority_queue<Node, std::vector<Node>, decltype(costComparisonLambda)> nodes(costComparisonLambda);
+	std::priority_queue<Node*, std::vector<Node*>, decltype(costComparisonLambda)> nodes(costComparisonLambda);
 
     // Initialize priority queue with initial state
-    const Node initialNode(0, problem.initialState);
+    Node* initialNode = new Node(0, problem.initialState);
     nodes.push(initialNode);
 
     // Keep looping until hit one of the return statements (or run out of memory :P)
@@ -151,39 +285,38 @@ void generalSearch(Problem problem, const std::function<void(std::priority_queue
             return;
         }
 
-        Node currentNode = nodes.top();
-        nodes.pop();
+        Node* currentNode = nodes.top();
 
-        if (currentNode.state == problem.goalState)
+// 		std::cout << "Current node:\n";
+// 		for (int i = 0; i < 3; ++i)		// @TODO: Hardcoded n value, should be a print function anyway...
+// 		{
+// 			for (int j = 0; j < 3; ++j)	// @TODO: Hardcoded n value, should be a print function anyway...
+// 			{
+// 				std::cout << currentNode->state[i][j] << '\t';
+// 			}
+// 			std::cout << std::endl;
+// 		}
+// 
+// 		std::cout << std::endl;
+
+        if (isGoalState(currentNode->state, problem.goalState, 3))	// @TODO: Hardcoded n value
         {
             // @TODO: SUCCESS
             std::cout << "temp message: success\n";
+
+			do 
+			{
+				printGrid(currentNode->state, 3);	// @ TODO: Hardcoded n value
+				currentNode = currentNode->parent;
+				std::cout << std::endl;
+			} while (currentNode->parent);
+
             return;
         }
 
-        queueingFunction(nodes);
+        queueingFunction(nodes, problem.operators);
+		nodes.pop();
     }
-}
-
-void pushQueue(std::priority_queue < Node, std::vector<Node>, decltype(costComparisonLambda) >& pq)
-{
-	pq.push(Node(2, nullptr));
-	pq.push(Node(4, nullptr));
-	pq.push(Node(3, nullptr));
-}
-
-void printQueue(std::priority_queue < Node, std::vector<Node>, decltype(costComparisonLambda) > pq)
-{
-	while (!pq.empty())
-	{
-		std::cout << pq.top().cost;
-		pq.pop();
-	}
-}
-
-void printGrid(int** grid, const int& n)
-{
-
 }
 
 int main()
@@ -261,9 +394,9 @@ int main()
     std::cout << std::endl;
 
     int initialGrid[][3] = {
-        {6,3,7},
-        {4,8,5},
-        {1,2,0}
+        {1,5,2},
+        {0,7,4},
+        {8,6,3}
     };
 
 	int** initialGridPtr = new int* [n];
@@ -294,7 +427,7 @@ int main()
 	operatorList[3] = movePieceRight;
 
 	Problem problem(initialGridPtr, solvedGrid, operatorList);
-	// generalSearch with queueing function that takes operators...
+	generalSearch(problem, uniformCostSearch);
 
 	// @TODO: Deallocate all resources
 }
