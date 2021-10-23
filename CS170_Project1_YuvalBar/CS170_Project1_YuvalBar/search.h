@@ -4,19 +4,22 @@
 #include <vector>
 #include <queue>
 
+// Defining gridi as 2D array of ints for simplicity
+using gridi = int**;
+
 // Forward declaration for Problem struct
 class Search;
 
 // This struct holds all important information necessary to solve the problem
 struct Problem
 {
-	int** initialState;
-	int** goalState;
-	std::function<bool(Search&, int**, const int&)>* operators;
+	gridi initialState;
+	gridi goalState;
+	std::function<bool(Search&, gridi, const int&)>* operators;
 
 	Problem() {}
 
-	Problem(int** inInitialState, int** inGoalState, std::function<bool(Search&, int**, const int&)>* inOperators) :
+	Problem(gridi inInitialState, gridi inGoalState, std::function<bool(Search&, gridi, const int&)>* inOperators) :
 		initialState(inInitialState),
 		goalState(inGoalState),
 		operators(inOperators)
@@ -26,11 +29,11 @@ struct Problem
 // This struct holds information for each search node
 struct Node
 {
-	int** state;
+	gridi state;
 	int cost = 0;
 	Node* parent = nullptr;
 
-	Node(int inCost, int** inState) :
+	Node(int inCost, gridi inState) :
 		cost(inCost),
 		state(inState)
 	{}
@@ -39,7 +42,7 @@ struct Node
 class Search
 {
 public:
-	Search(int** initialState, int** goalState);
+	Search(gridi initialState, gridi goalState);
 
 private:
 	Problem problem;
@@ -48,43 +51,43 @@ private:
 	// Comparison lambda for prioritizing nodes
 	std::function<bool(Node*, Node*)> costComparisonLambda = [](Node* a, Node* b) { return a->cost > b->cost; };
 
-	void uniformCostSearch(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::function<bool(Search&, int**, const int&)>* inOperators);
+	void uniformCostSearch(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::function<bool(Search&, gridi, const int&)>* inOperators);
 
-	int calculateNumMisplacedTiles(int** grid, const int& n);
+	int calculateNumMisplacedTiles(gridi grid, const int& n);
 
-	void aStarMisplacedTile(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::function<bool(Search&, int**, const int&)>* inOperators);
+	void aStarMisplacedTile(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::function<bool(Search&, gridi, const int&)>* inOperators);
 
-	void generalSearch(Problem problem, const std::function<void(Search&, std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >&, std::function<bool(Search&, int**, const int&)>*)>& queueingFunction);
+	void generalSearch(Problem problem, const std::function<void(Search&, std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >&, std::function<bool(Search&, gridi, const int&)>*)>& queueingFunction);
 
 	/* Grid */
-	bool isGoalState(int** grid, int** goal, const int& n);
+	bool isGoalState(gridi grid, gridi goal, const int& n);
 
-	std::vector<int**> exploredGrids;
+	std::vector<gridi> exploredGrids;
 
-	bool wasGridExplored(int** grid, int n);
+	bool wasGridExplored(gridi grid, int n);
 
-	void printGrid(int** grid, const int& n);
+	void printGrid(gridi grid, const int& n);
 	
-	int** copyGrid(int** state, const int& n);
+	gridi copyGrid(gridi state, const int& n);
 
-	void findZeroPiece(int& outRow, int& outCol, int** grid, const int& n);
+	void findZeroPiece(int& outRow, int& outCol, gridi grid, const int& n);
 
 	/* Operators */
 	// Function for moving piece down INTO the 0 spot
 	// Returns false if the operation was unsuccessful
-	bool movePieceDown(int** grid, const int& n);
+	bool movePieceDown(gridi grid, const int& n);
 
 	// Function for moving piece up INTO the 0 spot
 	// Returns false if the operation was unsuccessful
-	bool movePieceUp(int** grid, const int& n);
+	bool movePieceUp(gridi grid, const int& n);
 
 	// Function for moving piece left INTO the 0 spot
 	// Returns false if the operation was unsuccessful
-	bool movePieceLeft(int** grid, const int& n);
+	bool movePieceLeft(gridi grid, const int& n);
 
 	// Function for moving piece right INTO the 0 spot
 	// Returns false if the operation was unsuccessful
-	bool movePieceRight(int** grid, const int& n);
+	bool movePieceRight(gridi grid, const int& n);
 
 public:
 	void runUniformCostSearch();

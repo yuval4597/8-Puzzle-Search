@@ -2,10 +2,10 @@
 
 #include <iostream>
 
-Search::Search(int** initialState, int** goalState)
+Search::Search(gridi initialState, gridi goalState)
 {
 	const int numOfOperators = 4;	// Up, down, left, right
-	std::function<bool(Search&, int**, const int&)>* operatorList = new std::function<bool(Search&, int**, const int&)>[numOfOperators];
+	std::function<bool(Search&, gridi, const int&)>* operatorList = new std::function<bool(Search&, gridi, const int&)>[numOfOperators];
 	operatorList[0] = &Search::movePieceDown;
 	operatorList[1] = &Search::movePieceUp;
 	operatorList[2] = &Search::movePieceLeft;
@@ -16,7 +16,7 @@ Search::Search(int** initialState, int** goalState)
 	problem.operators = operatorList;
 }
 
-void Search::uniformCostSearch(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::function<bool(Search&, int**, const int&)>* inOperators)
+void Search::uniformCostSearch(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::function<bool(Search&, gridi, const int&)>* inOperators)
 {
 	if (outNodes.empty())
 	{
@@ -28,7 +28,7 @@ void Search::uniformCostSearch(std::priority_queue < Node*, std::vector<Node*>, 
 
 	for (auto i = 0; i < 4; ++i)	// @TODO: Hardcoded value of numOfOperators
 	{
-		int** copiedState = copyGrid(currentNode->state, 3);	// @TODO: Hardcoded value of n
+		gridi copiedState = copyGrid(currentNode->state, 3);	// @TODO: Hardcoded value of n
 		Node* newNode = new Node(currentNode->cost + 1, copiedState);
 		newNode->parent = currentNode;
 		// 		std::cout << "New node before inOperator" << i << std::endl;
@@ -66,7 +66,7 @@ void Search::uniformCostSearch(std::priority_queue < Node*, std::vector<Node*>, 
 	}
 }
 
-int Search::calculateNumMisplacedTiles(int** grid, const int& n)
+int Search::calculateNumMisplacedTiles(gridi grid, const int& n)
 {
 	// @TODO: This should simply compare to the goal grid
 	int numMisplaced = 0;
@@ -93,7 +93,7 @@ int Search::calculateNumMisplacedTiles(int** grid, const int& n)
 	return numMisplaced;
 }
 
-void Search::aStarMisplacedTile(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::function<bool(Search&, int**, const int&)>* inOperators)
+void Search::aStarMisplacedTile(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::function<bool(Search&, gridi, const int&)>* inOperators)
 {
 	if (outNodes.empty())
 	{
@@ -105,7 +105,7 @@ void Search::aStarMisplacedTile(std::priority_queue < Node*, std::vector<Node*>,
 
 	for (auto i = 0; i < 4; ++i)	// @TODO: Hardcoded value of numOfOperators
 	{
-		int** copiedState = copyGrid(currentNode->state, 3);	// @TODO: Hardcoded value of n
+		gridi copiedState = copyGrid(currentNode->state, 3);	// @TODO: Hardcoded value of n
 
 		// Costs
 		int g = currentNode->cost + 1;
@@ -150,7 +150,7 @@ void Search::aStarMisplacedTile(std::priority_queue < Node*, std::vector<Node*>,
 }
 
 // General search algorithm suggested by Dr. Keogh
-void Search::generalSearch(Problem problem, const std::function<void(Search&, std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >&, std::function<bool(Search&, int**, const int&)>*)>& queueingFunction)
+void Search::generalSearch(Problem problem, const std::function<void(Search&, std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >&, std::function<bool(Search&, gridi, const int&)>*)>& queueingFunction)
 {
 	std::priority_queue<Node*, std::vector<Node*>, decltype(costComparisonLambda)> nodes(costComparisonLambda);
 
@@ -202,7 +202,7 @@ void Search::generalSearch(Problem problem, const std::function<void(Search&, st
 	}
 }
 
-bool Search::isGoalState(int** grid, int** goal, const int& n)
+bool Search::isGoalState(gridi grid, gridi goal, const int& n)
 {
 	for (auto i = 0; i < n; ++i)
 	{
@@ -218,7 +218,7 @@ bool Search::isGoalState(int** grid, int** goal, const int& n)
 	return true;
 }
 
-bool Search::wasGridExplored(int** grid, int n)
+bool Search::wasGridExplored(gridi grid, int n)
 {
 	if (exploredGrids.empty())
 	{
@@ -254,7 +254,7 @@ bool Search::wasGridExplored(int** grid, int n)
 	return false;
 }
 
-void Search::printGrid(int** grid, const int& n)
+void Search::printGrid(gridi grid, const int& n)
 {
 	for (auto i = 0; i < n; ++i)
 	{
@@ -266,9 +266,9 @@ void Search::printGrid(int** grid, const int& n)
 	}
 }
 
-int** Search::copyGrid(int** state, const int& n)
+gridi Search::copyGrid(gridi state, const int& n)
 {
-	int** res = new int* [n];
+	gridi res = new int* [n];
 	for (auto i = 0; i < n; ++i)
 	{
 		res[i] = new int[n];
@@ -281,7 +281,7 @@ int** Search::copyGrid(int** state, const int& n)
 	return res;
 }
 
-void Search::findZeroPiece(int& outRow, int& outCol, int** grid, const int& n)
+void Search::findZeroPiece(int& outRow, int& outCol, gridi grid, const int& n)
 {
 	outRow = 0;
 	outCol = 0;
@@ -300,7 +300,7 @@ void Search::findZeroPiece(int& outRow, int& outCol, int** grid, const int& n)
 	}
 }
 
-bool Search::movePieceDown(int** grid, const int& n)
+bool Search::movePieceDown(gridi grid, const int& n)
 {
 	// Find 0 "piece" (technically blank spot)
 	int row = 0;
@@ -318,7 +318,7 @@ bool Search::movePieceDown(int** grid, const int& n)
 	return true;
 }
 
-bool Search::movePieceUp(int** grid, const int& n)
+bool Search::movePieceUp(gridi grid, const int& n)
 {
 	// Find 0 "piece" (technically blank spot)
 	int row = 0;
@@ -336,7 +336,7 @@ bool Search::movePieceUp(int** grid, const int& n)
 	return true;
 }
 
-bool Search::movePieceLeft(int** grid, const int& n)
+bool Search::movePieceLeft(gridi grid, const int& n)
 {
 	// Find 0 "piece" (technically blank spot)
 	int row = 0;
@@ -354,7 +354,7 @@ bool Search::movePieceLeft(int** grid, const int& n)
 	return true;
 }
 
-bool Search::movePieceRight(int** grid, const int& n)
+bool Search::movePieceRight(gridi grid, const int& n)
 {
 	// Find 0 "piece" (technically blank spot)
 	int row = 0;
