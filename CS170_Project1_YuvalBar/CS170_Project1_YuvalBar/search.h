@@ -4,6 +4,7 @@
 #include <vector>
 #include <queue>
 
+// Forward declaration for Problem struct
 class Search;
 
 // This struct holds all important information necessary to solve the problem
