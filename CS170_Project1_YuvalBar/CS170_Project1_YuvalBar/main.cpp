@@ -200,8 +200,6 @@ bool wasGridExplored(int** grid, int n)
 
 void uniformCostSearch(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::function<void(int**, int)>* inOperators)
 {
-	// @TODO: Keep track of explored nodes
-
 	if (outNodes.empty())
 	{
 		return;
@@ -245,6 +243,89 @@ void uniformCostSearch(std::priority_queue < Node*, std::vector<Node*>, decltype
 // 		}
 // 
 // 		std::cout << std::endl;
+
+		pq.pop();
+	}
+}
+
+int calculateNumMisplacedTiles(int** grid, const int& n)
+{
+	// @TODO: This should simply compare to the goal grid
+	int numMisplaced = 0;
+
+	for (int i = 0; i < n; ++i)
+	{
+		for (int j = 0; j < n; ++j)
+		{
+			if (grid[i][j] == 0)
+			{
+				// Not counting blank piece as misplaced tile
+				continue;
+			}
+
+			// Check explicitly if the last piece is not the 0 (blank) piece, others are straightforward
+			if ((i == n - 1 && j == n - 1) ||
+				grid[i][j] != (i * n) + j + 1)
+			{
+				++numMisplaced;
+			}
+		}
+	}
+
+	return numMisplaced;
+}
+
+void aStarMisplacedTile(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::function<void(int**, int)>* inOperators)
+{
+	if (outNodes.empty())
+	{
+		return;
+	}
+
+	Node* currentNode = outNodes.top();
+	exploredGrids.push_back(copyGrid(currentNode->state, 3));	// @TODO: Hardcoded value of n
+
+	for (auto i = 0; i < 4; ++i)	// @TODO: Hardcoded value of numOfOperators
+	{
+		int** copiedState = copyGrid(currentNode->state, 3);	// @TODO: Hardcoded value of n
+
+		// Costs
+		int g = currentNode->cost + 1;
+		int h = calculateNumMisplacedTiles(copiedState, 3);	// @TODO: Hardcoded value of n
+		int finalCost = h + g;
+
+		Node* newNode = new Node(finalCost, copiedState);	
+		newNode->parent = currentNode;
+		// 		std::cout << "New node before inOperator" << i << std::endl;
+		// 		printGrid(newNode->state, 3);
+
+		inOperators[i](newNode->state, 3);	// @TODO: Hardcoded value of n
+
+// 		std::cout << "\nNew node after inOperator" << i << std::endl;
+// 		printGrid(newNode->state, 3);
+// 		std::cout << std::endl;
+
+		if (!wasGridExplored(copiedState, 3))	// @TODO: Hardcoded value of n
+		{
+			outNodes.push(newNode);
+		}
+	}
+
+	std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) > pq(outNodes);
+
+	/*std::cout << "Current nodes in queue:\n";*/
+	while (!pq.empty())
+	{
+		// 		for (int i = 0; i < 3; ++i)		// @TODO: Hardcoded n value, should be a print function anyway...
+		// 		{
+		// 			for (int j = 0; j < 3; ++j)	// @TODO: Hardcoded n value, should be a print function anyway...
+		// 			{
+		// 				std::cout << pq.top()->state[i][j] << '\t';
+		// 			}
+		// 			std::cout << std::endl;
+		// 		}
+		// 
+		// 		std::cout << std::endl;
 
 		pq.pop();
 	}
@@ -394,9 +475,9 @@ int main()
     std::cout << std::endl;
 
     int initialGrid[][3] = {
-        {1,5,2},
-        {0,7,4},
-        {8,6,3}
+        {0,7,2},
+        {4,6,1},
+        {3,5,8}
     };
 
 	int** initialGridPtr = new int* [n];
@@ -427,7 +508,7 @@ int main()
 	operatorList[3] = movePieceRight;
 
 	Problem problem(initialGridPtr, solvedGrid, operatorList);
-	generalSearch(problem, uniformCostSearch);
+	generalSearch(problem, aStarMisplacedTile);
 
 	// @TODO: Deallocate all resources
 }
