@@ -210,13 +210,13 @@ void Search::generalSearch(Problem problem, const std::function<void(Search&, st
 			std::cout << "temp message: success\n";
 			int depth = 0;
 
-			do
+			while (currentNode->parent)
 			{
 				++depth;
 				printGrid(currentNode->state);
 				currentNode = currentNode->parent;
 				std::cout << std::endl;
-			} while (currentNode->parent);
+			}
 
 			std::cout << "Depth of " << depth << std::endl;
 			return;
