@@ -24,7 +24,7 @@ void Search::uniformCostSearch(std::priority_queue < Node*, std::vector<Node*>, 
 	}
 
 	Node* currentNode = outNodes.top();
-	exploredGrids.push_back(currentNode->state);
+	exploredGrids.insert(currentNode->state);
 
 	for (auto i = 0; i < 4; ++i)	// @TODO: Hardcoded value of numOfOperators
 	{
@@ -43,25 +43,6 @@ void Search::uniformCostSearch(std::priority_queue < Node*, std::vector<Node*>, 
 		{
 			outNodes.push(newNode);
 		}
-	}
-
-	std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) > pq(outNodes);
-
-	/*std::cout << "Current nodes in queue:\n";*/
-	while (!pq.empty())
-	{
-		// 		for (int i = 0; i < 3; ++i)		// @TODO: Hardcoded n value, should be a print function anyway...
-		// 		{
-		// 			for (int j = 0; j < 3; ++j)	// @TODO: Hardcoded n value, should be a print function anyway...
-		// 			{
-		// 				std::cout << pq.top()->state[i][j] << '\t';
-		// 			}
-		// 			std::cout << std::endl;
-		// 		}
-		// 
-		// 		std::cout << std::endl;
-
-		pq.pop();
 	}
 }
 
@@ -100,7 +81,7 @@ void Search::aStarMisplacedTile(std::priority_queue < Node*, std::vector<Node*>,
 	}
 
 	Node* currentNode = outNodes.top();
-	exploredGrids.push_back(currentNode->state);
+	exploredGrids.insert(currentNode->state);
 
 	for (auto i = 0; i < 4; ++i)	// @TODO: Hardcoded value of numOfOperators
 	{
@@ -124,25 +105,6 @@ void Search::aStarMisplacedTile(std::priority_queue < Node*, std::vector<Node*>,
 		{
 			outNodes.push(newNode);
 		}
-	}
-
-	std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) > pq(outNodes);
-
-	/*std::cout << "Current nodes in queue:\n";*/
-	while (!pq.empty())
-	{
-		// 		for (int i = 0; i < 3; ++i)		// @TODO: Hardcoded n value, should be a print function anyway...
-		// 		{
-		// 			for (int j = 0; j < 3; ++j)	// @TODO: Hardcoded n value, should be a print function anyway...
-		// 			{
-		// 				std::cout << pq.top()->state[i][j] << '\t';
-		// 			}
-		// 			std::cout << std::endl;
-		// 		}
-		// 
-		// 		std::cout << std::endl;
-
-		pq.pop();
 	}
 }
 
@@ -206,12 +168,10 @@ bool Search::isGoalState(const gridi& grid, const gridi& goal)
 
 bool Search::wasGridExplored(const gridi& grid)
 {
-	for (auto exploredGrid : exploredGrids)
+	auto iter = exploredGrids.find(grid);
+	if (iter != exploredGrids.end())
 	{
-		if (grid == exploredGrid)
-		{
-			return true;
-		}
+		return true;
 	}
 
 	return false;

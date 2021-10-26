@@ -3,6 +3,7 @@
 #include <functional>
 #include <vector>
 #include <queue>
+#include <unordered_set>
 
 // Defining gridi as 2D array of ints for simplicity
 using gridi = std::vector<std::vector<int>>;
@@ -39,6 +40,24 @@ struct Node
 	{}
 };
 
+struct HashFn
+{
+	size_t operator()(const gridi& g) const
+	{
+		std::hash<int> hasher;
+		size_t res = 0;
+		for (size_t i = 0; i < g.size(); ++i)
+		{
+			for (size_t j = 0; j < g[0].size(); ++j)
+			{
+				res *= 31 * hasher(g[i][j]);
+			}
+		}
+
+		return res;
+	}
+};
+
 class Search
 {
 public:
@@ -62,7 +81,7 @@ private:
 	/* Grid */
 	bool isGoalState(const gridi& grid, const gridi& goal);
 
-	std::vector<gridi> exploredGrids;
+	std::unordered_set<gridi, HashFn> exploredGrids;
 
 	bool wasGridExplored(const gridi& grid);
 

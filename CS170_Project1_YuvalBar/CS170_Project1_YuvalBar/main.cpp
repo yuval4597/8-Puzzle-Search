@@ -34,9 +34,9 @@ int main()
     std::cout << std::endl;
 
 	gridi initialGrid = {
-		{1,3,6},
-		{5,0,7},
-		{4,8,2}
+		{1,2,3},
+		{4,5,6},
+		{0,7,8}
 	};
 
 	std::cout << "initial grid:\n";
