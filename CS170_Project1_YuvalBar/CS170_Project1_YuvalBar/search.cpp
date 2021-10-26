@@ -5,7 +5,7 @@
 Search::Search(gridi initialState, gridi goalState)
 {
 	const int numOfOperators = 4;	// Up, down, left, right
-	std::function<bool(Search&, gridi, const int&)>* operatorList = new std::function<bool(Search&, gridi, const int&)>[numOfOperators];
+	std::function<bool(Search&, gridi&)>* operatorList = new std::function<bool(Search&, gridi&)>[numOfOperators];
 	operatorList[0] = &Search::movePieceDown;
 	operatorList[1] = &Search::movePieceUp;
 	operatorList[2] = &Search::movePieceLeft;
@@ -16,7 +16,7 @@ Search::Search(gridi initialState, gridi goalState)
 	problem.operators = operatorList;
 }
 
-void Search::uniformCostSearch(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::function<bool(Search&, gridi, const int&)>* inOperators)
+void Search::uniformCostSearch(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::function<bool(Search&, gridi&)>* inOperators)
 {
 	if (outNodes.empty())
 	{
@@ -24,23 +24,22 @@ void Search::uniformCostSearch(std::priority_queue < Node*, std::vector<Node*>, 
 	}
 
 	Node* currentNode = outNodes.top();
-	exploredGrids.push_back(copyGrid(currentNode->state, 3));	// @TODO: Hardcoded value of n
+	exploredGrids.push_back(currentNode->state);
 
 	for (auto i = 0; i < 4; ++i)	// @TODO: Hardcoded value of numOfOperators
 	{
-		gridi copiedState = copyGrid(currentNode->state, 3);	// @TODO: Hardcoded value of n
-		Node* newNode = new Node(currentNode->cost + 1, copiedState);
+		Node* newNode = new Node(currentNode->cost + 1, currentNode->state);
 		newNode->parent = currentNode;
-		// 		std::cout << "New node before inOperator" << i << std::endl;
-		// 		printGrid(newNode->state, 3);
+// 		std::cout << "New node before inOperator" << i << std::endl;
+// 		printGrid(newNode->state);
 
-		inOperators[i](*this, newNode->state, 3);	// @TODO: Hardcoded value of n
+		inOperators[i](*this, newNode->state);
 
 // 		std::cout << "\nNew node after inOperator" << i << std::endl;
-// 		printGrid(newNode->state, 3);
+// 		printGrid(newNode->state);
 // 		std::cout << std::endl;
 
-		if (!wasGridExplored(copiedState, 3))	// @TODO: Hardcoded value of n
+		if (!wasGridExplored(newNode->state))
 		{
 			outNodes.push(newNode);
 		}
@@ -66,14 +65,14 @@ void Search::uniformCostSearch(std::priority_queue < Node*, std::vector<Node*>, 
 	}
 }
 
-int Search::calculateNumMisplacedTiles(gridi grid, const int& n)
+int Search::calculateNumMisplacedTiles(gridi grid)
 {
 	// @TODO: This should simply compare to the goal grid
 	int numMisplaced = 0;
 
-	for (int i = 0; i < n; ++i)
+	for (int i = 0; i < grid.size(); ++i)
 	{
-		for (int j = 0; j < n; ++j)
+		for (int j = 0; j < grid[0].size(); ++j)
 		{
 			if (grid[i][j] == 0)
 			{
@@ -82,8 +81,8 @@ int Search::calculateNumMisplacedTiles(gridi grid, const int& n)
 			}
 
 			// Check explicitly if the last piece is not the 0 (blank) piece, others are straightforward
-			if ((i == n - 1 && j == n - 1) ||
-				grid[i][j] != (i * n) + j + 1)
+			if ((i == grid.size() - 1 && j == grid[0].size() - 1) ||
+				grid[i][j] != (i * grid.size()) + j + 1)
 			{
 				++numMisplaced;
 			}
@@ -93,7 +92,7 @@ int Search::calculateNumMisplacedTiles(gridi grid, const int& n)
 	return numMisplaced;
 }
 
-void Search::aStarMisplacedTile(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::function<bool(Search&, gridi, const int&)>* inOperators)
+void Search::aStarMisplacedTile(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::function<bool(Search&, gridi&)>* inOperators)
 {
 	if (outNodes.empty())
 	{
@@ -101,29 +100,27 @@ void Search::aStarMisplacedTile(std::priority_queue < Node*, std::vector<Node*>,
 	}
 
 	Node* currentNode = outNodes.top();
-	exploredGrids.push_back(copyGrid(currentNode->state, 3));	// @TODO: Hardcoded value of n
+	exploredGrids.push_back(currentNode->state);
 
 	for (auto i = 0; i < 4; ++i)	// @TODO: Hardcoded value of numOfOperators
 	{
-		gridi copiedState = copyGrid(currentNode->state, 3);	// @TODO: Hardcoded value of n
-
 		// Costs
 		int g = currentNode->cost + 1;
-		int h = calculateNumMisplacedTiles(copiedState, 3);	// @TODO: Hardcoded value of n
+		int h = calculateNumMisplacedTiles(currentNode->state);
 		int finalCost = h + g;
 
-		Node* newNode = new Node(finalCost, copiedState);
+		Node* newNode = new Node(finalCost, currentNode->state);
 		newNode->parent = currentNode;
 		// 		std::cout << "New node before inOperator" << i << std::endl;
 		// 		printGrid(newNode->state, 3);
 
-		inOperators[i](*this, newNode->state, 3);	// @TODO: Hardcoded value of n
+		inOperators[i](*this, newNode->state);
 
 // 		std::cout << "\nNew node after inOperator" << i << std::endl;
 // 		printGrid(newNode->state, 3);
 // 		std::cout << std::endl;
 
-		if (!wasGridExplored(copiedState, 3))	// @TODO: Hardcoded value of n
+		if (!wasGridExplored(newNode->state))
 		{
 			outNodes.push(newNode);
 		}
@@ -150,7 +147,7 @@ void Search::aStarMisplacedTile(std::priority_queue < Node*, std::vector<Node*>,
 }
 
 // General search algorithm suggested by Dr. Keogh
-void Search::generalSearch(Problem problem, const std::function<void(Search&, std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >&, std::function<bool(Search&, gridi, const int&)>*)>& queueingFunction)
+void Search::generalSearch(Problem problem, const std::function<void(Search&, std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >&, std::function<bool(Search&, gridi&)>*)>& queueingFunction)
 {
 	std::priority_queue<Node*, std::vector<Node*>, decltype(costComparisonLambda)> nodes(costComparisonLambda);
 
@@ -182,14 +179,14 @@ void Search::generalSearch(Problem problem, const std::function<void(Search&, st
 		// 
 		// 		std::cout << std::endl;
 
-		if (isGoalState(currentNode->state, problem.goalState, 3))	// @TODO: Hardcoded n value
+		if (isGoalState(currentNode->state, problem.goalState))
 		{
 			// @TODO: SUCCESS
 			std::cout << "temp message: success\n";
 
 			do
 			{
-				printGrid(currentNode->state, 3);	// @ TODO: Hardcoded n value
+				printGrid(currentNode->state);
 				currentNode = currentNode->parent;
 				std::cout << std::endl;
 			} while (currentNode->parent);
@@ -202,50 +199,16 @@ void Search::generalSearch(Problem problem, const std::function<void(Search&, st
 	}
 }
 
-bool Search::isGoalState(gridi grid, gridi goal, const int& n)
+bool Search::isGoalState(const gridi& grid, const gridi& goal)
 {
-	for (auto i = 0; i < n; ++i)
-	{
-		for (auto j = 0; j < n; ++j)
-		{
-			if (grid[i][j] != goal[i][j])
-			{
-				return false;
-			}
-		}
-	}
-
-	return true;
+	return grid == goal;
 }
 
-bool Search::wasGridExplored(gridi grid, int n)
+bool Search::wasGridExplored(const gridi& grid)
 {
-	if (exploredGrids.empty())
-	{
-		return false;
-	}
-
 	for (auto exploredGrid : exploredGrids)
 	{
-		bool isMatch = true;
-		for (auto i = 0; i < n; ++i)
-		{
-			for (auto j = 0; j < n; ++j)
-			{
-				if (grid[i][j] != exploredGrid[i][j])
-				{
-					isMatch = false;
-					break;
-				}
-			}
-
-			if (!isMatch)
-			{
-				break;
-			}
-		}
-
-		if (isMatch)
+		if (grid == exploredGrid)
 		{
 			return true;
 		}
@@ -254,11 +217,11 @@ bool Search::wasGridExplored(gridi grid, int n)
 	return false;
 }
 
-void Search::printGrid(gridi grid, const int& n)
+void Search::printGrid(const gridi& grid)
 {
-	for (auto i = 0; i < n; ++i)
+	for (auto i = 0; i < grid.size(); ++i)
 	{
-		for (auto j = 0; j < n; ++j)
+		for (auto j = 0; j < grid[0].size(); ++j)
 		{
 			std::cout << grid[i][j] << '\t';
 		}
@@ -266,29 +229,14 @@ void Search::printGrid(gridi grid, const int& n)
 	}
 }
 
-gridi Search::copyGrid(gridi state, const int& n)
-{
-	gridi res = new int* [n];
-	for (auto i = 0; i < n; ++i)
-	{
-		res[i] = new int[n];
-		for (auto j = 0; j < n; ++j)
-		{
-			res[i][j] = state[i][j];
-		}
-	}
-
-	return res;
-}
-
-void Search::findZeroPiece(int& outRow, int& outCol, gridi grid, const int& n)
+void Search::findZeroPiece(int& outRow, int& outCol, const gridi& grid)
 {
 	outRow = 0;
 	outCol = 0;
 
-	for (int i = 0; i < n; ++i)
+	for (int i = 0; i < grid.size(); ++i)
 	{
-		for (int j = 0; j < n; ++j)
+		for (int j = 0; j < grid[0].size(); ++j)
 		{
 			if (grid[i][j] == 0)
 			{
@@ -300,13 +248,13 @@ void Search::findZeroPiece(int& outRow, int& outCol, gridi grid, const int& n)
 	}
 }
 
-bool Search::movePieceDown(gridi grid, const int& n)
+bool Search::movePieceDown(gridi& grid)
 {
 	// Find 0 "piece" (technically blank spot)
 	int row = 0;
 	int col = 0;
 
-	findZeroPiece(row, col, grid, n);
+	findZeroPiece(row, col, grid);
 
 	if (row == 0)
 	{
@@ -318,15 +266,15 @@ bool Search::movePieceDown(gridi grid, const int& n)
 	return true;
 }
 
-bool Search::movePieceUp(gridi grid, const int& n)
+bool Search::movePieceUp(gridi& grid)
 {
 	// Find 0 "piece" (technically blank spot)
 	int row = 0;
 	int col = 0;
 
-	findZeroPiece(row, col, grid, n);
+	findZeroPiece(row, col, grid);
 
-	if (row == n - 1)
+	if (row == grid.size() - 1)
 	{
 		// Cannot move piece up into 0 spot if it is already at the bottommost row
 		return false;
@@ -336,15 +284,15 @@ bool Search::movePieceUp(gridi grid, const int& n)
 	return true;
 }
 
-bool Search::movePieceLeft(gridi grid, const int& n)
+bool Search::movePieceLeft(gridi& grid)
 {
 	// Find 0 "piece" (technically blank spot)
 	int row = 0;
 	int col = 0;
 
-	findZeroPiece(row, col, grid, n);
+	findZeroPiece(row, col, grid);
 
-	if (col == n - 1)
+	if (col == grid[0].size() - 1)
 	{
 		// Cannot move piece left into 0 spot if it is already at the rightmost column
 		return false;
@@ -354,13 +302,13 @@ bool Search::movePieceLeft(gridi grid, const int& n)
 	return true;
 }
 
-bool Search::movePieceRight(gridi grid, const int& n)
+bool Search::movePieceRight(gridi& grid)
 {
 	// Find 0 "piece" (technically blank spot)
 	int row = 0;
 	int col = 0;
 
-	findZeroPiece(row, col, grid, n);
+	findZeroPiece(row, col, grid);
 
 	if (col == 0)
 	{

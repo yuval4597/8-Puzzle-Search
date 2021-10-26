@@ -5,7 +5,7 @@
 #include <queue>
 
 // Defining gridi as 2D array of ints for simplicity
-using gridi = int**;
+using gridi = std::vector<std::vector<int>>;
 
 // Forward declaration for Problem struct
 class Search;
@@ -15,11 +15,11 @@ struct Problem
 {
 	gridi initialState;
 	gridi goalState;
-	std::function<bool(Search&, gridi, const int&)>* operators;
+	std::function<bool(Search&, gridi&)>* operators;
 
 	Problem() {}
 
-	Problem(gridi inInitialState, gridi inGoalState, std::function<bool(Search&, gridi, const int&)>* inOperators) :
+	Problem(gridi inInitialState, gridi inGoalState, std::function<bool(Search&, gridi&)>* inOperators) :
 		initialState(inInitialState),
 		goalState(inGoalState),
 		operators(inOperators)
@@ -51,43 +51,41 @@ private:
 	// Comparison lambda for prioritizing nodes
 	std::function<bool(Node*, Node*)> costComparisonLambda = [](Node* a, Node* b) { return a->cost > b->cost; };
 
-	void uniformCostSearch(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::function<bool(Search&, gridi, const int&)>* inOperators);
+	void uniformCostSearch(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::function<bool(Search&, gridi&)>* inOperators);
 
-	int calculateNumMisplacedTiles(gridi grid, const int& n);
+	int calculateNumMisplacedTiles(gridi grid);
 
-	void aStarMisplacedTile(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::function<bool(Search&, gridi, const int&)>* inOperators);
+	void aStarMisplacedTile(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::function<bool(Search&, gridi&)>* inOperators);
 
-	void generalSearch(Problem problem, const std::function<void(Search&, std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >&, std::function<bool(Search&, gridi, const int&)>*)>& queueingFunction);
+	void generalSearch(Problem problem, const std::function<void(Search&, std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >&, std::function<bool(Search&, gridi&)>*)>& queueingFunction);
 
 	/* Grid */
-	bool isGoalState(gridi grid, gridi goal, const int& n);
+	bool isGoalState(const gridi& grid, const gridi& goal);
 
 	std::vector<gridi> exploredGrids;
 
-	bool wasGridExplored(gridi grid, int n);
+	bool wasGridExplored(const gridi& grid);
 
-	void printGrid(gridi grid, const int& n);
-	
-	gridi copyGrid(gridi state, const int& n);
+	void printGrid(const gridi& grid);
 
-	void findZeroPiece(int& outRow, int& outCol, gridi grid, const int& n);
+	void findZeroPiece(int& outRow, int& outCol, const gridi& grid);
 
 	/* Operators */
 	// Function for moving piece down INTO the 0 spot
 	// Returns false if the operation was unsuccessful
-	bool movePieceDown(gridi grid, const int& n);
+	bool movePieceDown(gridi& grid);
 
 	// Function for moving piece up INTO the 0 spot
 	// Returns false if the operation was unsuccessful
-	bool movePieceUp(gridi grid, const int& n);
+	bool movePieceUp(gridi& grid);
 
 	// Function for moving piece left INTO the 0 spot
 	// Returns false if the operation was unsuccessful
-	bool movePieceLeft(gridi grid, const int& n);
+	bool movePieceLeft(gridi& grid);
 
 	// Function for moving piece right INTO the 0 spot
 	// Returns false if the operation was unsuccessful
-	bool movePieceRight(gridi grid, const int& n);
+	bool movePieceRight(gridi& grid);
 
 public:
 	void runUniformCostSearch();
