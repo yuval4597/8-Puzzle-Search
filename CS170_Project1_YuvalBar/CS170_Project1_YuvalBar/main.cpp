@@ -33,11 +33,64 @@ int main()
 
     std::cout << std::endl;
 
-	gridi initialGrid = {
-		{0,7,2},
-		{4,6,1},
-		{3,5,8}
+	std::vector<gridi> testGrids = {
+		{
+			// Depth 0
+			{1,2,3},
+			{4,5,6},
+			{7,8,0}
+		},
+		{
+			// Depth 2
+			{1,2,3},
+			{4,5,6},
+			{0,7,8}
+		},
+		{
+			// Depth 4
+			{1,2,3},
+			{5,0,6},
+			{4,7,8}
+		},
+		{
+			// Depth 8
+			{1,3,6},
+			{5,0,2},
+			{4,7,8}
+		},
+		{
+			// Depth 12
+			{1,3,6},
+			{5,0,7},
+			{4,8,2}
+		},
+		{
+			// Depth 16
+			{1,6,7},
+			{5,0,3},
+			{4,8,2}
+		},
+		{
+			// Depth 20
+			{7,1,2},
+			{4,8,5},
+			{6,3,0}
+		},
+		{
+			// Depth 24
+			{0,7,2},
+			{4,6,1},
+			{3,5,8}
+		},
 	};
+
+	gridi tempGrid = {
+		{8,1,5},
+		{6,7,4},
+		{2,3,0}
+	};
+
+	gridi initialGrid = testGrids[0];
 
 	std::cout << "initial grid:\n";
 
@@ -55,5 +108,5 @@ int main()
 	Search search(initialGrid, solvedGrid);
 	search.runAstarManhattanDistanceSearch();
 
-	// @TODO: Deallocate all resources
+	// @TODO: Deallocate all resources (namely nodes)
 }
