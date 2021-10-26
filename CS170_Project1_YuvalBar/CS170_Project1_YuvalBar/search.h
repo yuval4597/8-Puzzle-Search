@@ -38,6 +38,11 @@ struct Node
 		cost(inCost),
 		state(inState)
 	{}
+
+	Node(gridi inState) :
+		cost(0),
+		state(inState)
+	{}
 };
 
 struct HashFn

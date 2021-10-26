@@ -85,12 +85,7 @@ void Search::aStarMisplacedTile(std::priority_queue < Node*, std::vector<Node*>,
 
 	for (auto i = 0; i < 4; ++i)	// @TODO: Hardcoded value of numOfOperators
 	{
-		// Costs
-		int g = currentNode->cost + 1;
-		int h = calculateNumMisplacedTiles(currentNode->state);
-		int finalCost = h + g;
-
-		Node* newNode = new Node(finalCost, currentNode->state);
+		Node* newNode = new Node(currentNode->state);
 		newNode->parent = currentNode;
 		// 		std::cout << "New node before inOperator" << i << std::endl;
 		// 		printGrid(newNode->state, 3);
@@ -100,6 +95,13 @@ void Search::aStarMisplacedTile(std::priority_queue < Node*, std::vector<Node*>,
 // 		std::cout << "\nNew node after inOperator" << i << std::endl;
 // 		printGrid(newNode->state, 3);
 // 		std::cout << std::endl;
+
+		// Costs
+		int g = currentNode->cost + 1;
+		int h = calculateNumMisplacedTiles(newNode->state);
+		int finalCost = h + g;
+
+		newNode->cost = finalCost;
 
 		if (!wasGridExplored(newNode->state))
 		{
