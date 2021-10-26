@@ -53,7 +53,6 @@ struct HashFn
 		const int p = 7919;
 		const int q = 3671;
 
-		std::hash<int> hasher;
 		size_t res = 0;
 		for (size_t i = 0; i < g.size(); ++i)
 		{
