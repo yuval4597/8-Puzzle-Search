@@ -49,13 +49,17 @@ struct HashFn
 {
 	size_t operator()(const gridi& g) const
 	{
+		// Primes
+		const int p = 7919;
+		const int q = 3671;
+
 		std::hash<int> hasher;
 		size_t res = 0;
 		for (size_t i = 0; i < g.size(); ++i)
 		{
 			for (size_t j = 0; j < g[0].size(); ++j)
 			{
-				res *= 31 * hasher(g[i][j]);
+				res ^= (static_cast<int>(pow(p, i)) + static_cast<int>(pow(q, j))) * g[i][j];
 			}
 		}
 
@@ -77,9 +81,13 @@ private:
 
 	void uniformCostSearch(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::function<bool(Search&, gridi&)>* inOperators);
 
-	int calculateNumMisplacedTiles(gridi grid);
+	int calculateNumMisplacedTiles(const gridi& grid);
 
 	void aStarMisplacedTile(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::function<bool(Search&, gridi&)>* inOperators);
+
+	int calculateManhattanDistance(const gridi& grid, const gridi& goal);
+
+	void aStarManhattanDistance(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::function<bool(Search&, gridi&)>* inOperators);
 
 	void generalSearch(Problem problem, const std::function<void(Search&, std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >&, std::function<bool(Search&, gridi&)>*)>& queueingFunction);
 
@@ -92,7 +100,7 @@ private:
 
 	void printGrid(const gridi& grid);
 
-	void findZeroPiece(int& outRow, int& outCol, const gridi& grid);
+	void findPiece(int piece, int& outRow, int& outCol, const gridi& grid);
 
 	/* Operators */
 	// Function for moving piece down INTO the 0 spot
@@ -115,4 +123,6 @@ public:
 	void runUniformCostSearch();
 
 	void runAstarMisplacedTileSearch();
+
+	void runAstarManhattanDistanceSearch();
 };

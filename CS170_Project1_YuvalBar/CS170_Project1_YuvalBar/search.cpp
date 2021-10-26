@@ -46,7 +46,7 @@ void Search::uniformCostSearch(std::priority_queue < Node*, std::vector<Node*>, 
 	}
 }
 
-int Search::calculateNumMisplacedTiles(gridi grid)
+int Search::calculateNumMisplacedTiles(const gridi& grid)
 {
 	// @TODO: This should simply compare to the goal grid
 	int numMisplaced = 0;
@@ -110,6 +110,67 @@ void Search::aStarMisplacedTile(std::priority_queue < Node*, std::vector<Node*>,
 	}
 }
 
+int Search::calculateManhattanDistance(const gridi& grid, const gridi& goal)
+{
+	int totalDistance = 0;
+
+	for (auto i = 0; i < grid.size(); ++i)
+	{
+		for (auto j = 0; j < grid[0].size(); ++j)
+		{
+			int row = 0;
+			int col = 0;
+
+			// Find this piece in the goal grid in order to calculate distance
+			findPiece(grid[i][j], row, col, goal);
+
+			const int distanceForThisTile = abs(row - i) + abs(col - j);
+			totalDistance += distanceForThisTile;
+		}
+	}
+
+	return totalDistance;
+}
+
+void Search::aStarManhattanDistance(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::function<bool(Search&, gridi&)>* inOperators)
+{
+	if (outNodes.empty())
+	{
+		return;
+	}
+
+	Node* currentNode = outNodes.top();
+	exploredGrids.insert(currentNode->state);
+
+	for (auto i = 0; i < 4; ++i)	// @TODO: Hardcoded value of numOfOperators
+	{
+		Node* newNode = new Node(currentNode->state);
+		newNode->parent = currentNode;
+		// 		std::cout << "New node before inOperator" << i << std::endl;
+		// 		printGrid(newNode->state, 3);
+
+		inOperators[i](*this, newNode->state);
+
+		// 		std::cout << "\nNew node after inOperator" << i << std::endl;
+		// 		printGrid(newNode->state, 3);
+		// 		std::cout << std::endl;
+
+		// Costs
+		int g = currentNode->cost + 1;
+		int h = calculateManhattanDistance(newNode->state, problem.goalState);
+		int finalCost = h + g;
+
+		newNode->cost = finalCost;
+
+		if (!wasGridExplored(newNode->state))
+		{
+			outNodes.push(newNode);
+		}
+
+		// @TODO : Else delete unused new node (do in all queuing functions?)
+	}
+}
+
 // General search algorithm suggested by Dr. Keogh
 void Search::generalSearch(Problem problem, const std::function<void(Search&, std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >&, std::function<bool(Search&, gridi&)>*)>& queueingFunction)
 {
@@ -147,14 +208,17 @@ void Search::generalSearch(Problem problem, const std::function<void(Search&, st
 		{
 			// @TODO: SUCCESS
 			std::cout << "temp message: success\n";
+			int depth = 0;
 
 			do
 			{
+				++depth;
 				printGrid(currentNode->state);
 				currentNode = currentNode->parent;
 				std::cout << std::endl;
 			} while (currentNode->parent);
 
+			std::cout << "Depth of " << depth << std::endl;
 			return;
 		}
 
@@ -191,7 +255,7 @@ void Search::printGrid(const gridi& grid)
 	}
 }
 
-void Search::findZeroPiece(int& outRow, int& outCol, const gridi& grid)
+void Search::findPiece(int piece, int& outRow, int& outCol, const gridi& grid)
 {
 	outRow = 0;
 	outCol = 0;
@@ -200,7 +264,7 @@ void Search::findZeroPiece(int& outRow, int& outCol, const gridi& grid)
 	{
 		for (int j = 0; j < grid[0].size(); ++j)
 		{
-			if (grid[i][j] == 0)
+			if (grid[i][j] == piece)
 			{
 				outRow = i;
 				outCol = j;
@@ -216,7 +280,7 @@ bool Search::movePieceDown(gridi& grid)
 	int row = 0;
 	int col = 0;
 
-	findZeroPiece(row, col, grid);
+	findPiece(0, row, col, grid);
 
 	if (row == 0)
 	{
@@ -234,7 +298,7 @@ bool Search::movePieceUp(gridi& grid)
 	int row = 0;
 	int col = 0;
 
-	findZeroPiece(row, col, grid);
+	findPiece(0, row, col, grid);
 
 	if (row == grid.size() - 1)
 	{
@@ -252,7 +316,7 @@ bool Search::movePieceLeft(gridi& grid)
 	int row = 0;
 	int col = 0;
 
-	findZeroPiece(row, col, grid);
+	findPiece(0, row, col, grid);
 
 	if (col == grid[0].size() - 1)
 	{
@@ -270,7 +334,7 @@ bool Search::movePieceRight(gridi& grid)
 	int row = 0;
 	int col = 0;
 
-	findZeroPiece(row, col, grid);
+	findPiece(0, row, col, grid);
 
 	if (col == 0)
 	{
@@ -290,4 +354,9 @@ void Search::runUniformCostSearch()
 void Search::runAstarMisplacedTileSearch()
 {
 	generalSearch(problem, &Search::aStarMisplacedTile);
+}
+
+void Search::runAstarManhattanDistanceSearch()
+{
+	generalSearch(problem, &Search::aStarManhattanDistance);
 }

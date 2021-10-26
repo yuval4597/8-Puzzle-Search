@@ -34,9 +34,9 @@ int main()
     std::cout << std::endl;
 
 	gridi initialGrid = {
-		{7,1,2},
-		{4,8,5},
-		{6,3,0}
+		{0,7,2},
+		{4,6,1},
+		{3,5,8}
 	};
 
 	std::cout << "initial grid:\n";
@@ -53,7 +53,7 @@ int main()
 	std::cout << std::endl;
 
 	Search search(initialGrid, solvedGrid);
-	search.runAstarMisplacedTileSearch();
+	search.runAstarManhattanDistanceSearch();
 
 	// @TODO: Deallocate all resources
 }
