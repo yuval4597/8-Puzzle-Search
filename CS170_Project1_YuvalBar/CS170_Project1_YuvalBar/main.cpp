@@ -90,7 +90,7 @@ int main()
 		{2,3,0}
 	};
 
-	gridi initialGrid = testGrids[0];
+	gridi initialGrid = testGrids[7];
 
 	std::cout << "initial grid:\n";
 

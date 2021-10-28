@@ -30,14 +30,8 @@ void Search::uniformCostSearch(std::priority_queue < Node*, std::vector<Node*>, 
 	{
 		Node* newNode = new Node(currentNode->cost + 1, currentNode->state);
 		newNode->parent = currentNode;
-// 		std::cout << "New node before inOperator" << i << std::endl;
-// 		printGrid(newNode->state);
 
 		inOperators[i](*this, newNode->state);
-
-// 		std::cout << "\nNew node after inOperator" << i << std::endl;
-// 		printGrid(newNode->state);
-// 		std::cout << std::endl;
 
 		if (!wasGridExplored(newNode->state))
 		{
@@ -87,14 +81,8 @@ void Search::aStarMisplacedTile(std::priority_queue < Node*, std::vector<Node*>,
 	{
 		Node* newNode = new Node(currentNode->state);
 		newNode->parent = currentNode;
-		// 		std::cout << "New node before inOperator" << i << std::endl;
-		// 		printGrid(newNode->state, 3);
 
 		inOperators[i](*this, newNode->state);
-
-// 		std::cout << "\nNew node after inOperator" << i << std::endl;
-// 		printGrid(newNode->state, 3);
-// 		std::cout << std::endl;
 
 		// Costs
 		int g = currentNode->cost + 1;
@@ -118,6 +106,11 @@ int Search::calculateManhattanDistance(const gridi& grid, const gridi& goal)
 	{
 		for (auto j = 0; j < grid[0].size(); ++j)
 		{
+			if (grid[i][j] == 0)
+			{
+				continue;
+			}
+
 			int row = 0;
 			int col = 0;
 
@@ -146,14 +139,8 @@ void Search::aStarManhattanDistance(std::priority_queue < Node*, std::vector<Nod
 	{
 		Node* newNode = new Node(currentNode->state);
 		newNode->parent = currentNode;
-		// 		std::cout << "New node before inOperator" << i << std::endl;
-		// 		printGrid(newNode->state, 3);
 
 		inOperators[i](*this, newNode->state);
-
-		// 		std::cout << "\nNew node after inOperator" << i << std::endl;
-		// 		printGrid(newNode->state, 3);
-		// 		std::cout << std::endl;
 
 		// Costs
 		int g = currentNode->cost + 1;
@@ -172,7 +159,7 @@ void Search::aStarManhattanDistance(std::priority_queue < Node*, std::vector<Nod
 }
 
 // General search algorithm suggested by Dr. Keogh
-void Search::generalSearch(Problem problem, const std::function<void(Search&, std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >&, std::function<bool(Search&, gridi&)>*)>& queueingFunction)
+bool Search::generalSearch(Problem problem, const std::function<void(Search&, std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >&, std::function<bool(Search&, gridi&)>*)>& queueingFunction)
 {
 	std::priority_queue<Node*, std::vector<Node*>, decltype(costComparisonLambda)> nodes(costComparisonLambda);
 
@@ -185,29 +172,15 @@ void Search::generalSearch(Problem problem, const std::function<void(Search&, st
 	{
 		if (nodes.empty())
 		{
-			// @TODO: FAILURE
-			std::cout << "temp message: failure\n";
-			return;
+			std::cout << "FAILURE\n";
+			return false;
 		}
 
 		Node* currentNode = nodes.top();
 
-		// 		std::cout << "Current node:\n";
-		// 		for (int i = 0; i < 3; ++i)		// @TODO: Hardcoded n value, should be a print function anyway...
-		// 		{
-		// 			for (int j = 0; j < 3; ++j)	// @TODO: Hardcoded n value, should be a print function anyway...
-		// 			{
-		// 				std::cout << currentNode->state[i][j] << '\t';
-		// 			}
-		// 			std::cout << std::endl;
-		// 		}
-		// 
-		// 		std::cout << std::endl;
-
 		if (isGoalState(currentNode->state, problem.goalState))
 		{
-			// @TODO: SUCCESS
-			std::cout << "temp message: success\n";
+			std::cout << "SUCCESS\n";
 			int depth = 0;
 
 			while (currentNode->parent)
@@ -219,7 +192,7 @@ void Search::generalSearch(Problem problem, const std::function<void(Search&, st
 			}
 
 			std::cout << "Depth of " << depth << std::endl;
-			return;
+			return true;
 		}
 
 		queueingFunction(*this, nodes, problem.operators);
