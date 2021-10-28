@@ -4,18 +4,15 @@
 
 Search::Search(gridi initialState, gridi goalState)
 {
-	const int numOfOperators = 4;	// Up, down, left, right
-	std::function<bool(Search&, gridi&)>* operatorList = new std::function<bool(Search&, gridi&)>[numOfOperators];
-	operatorList[0] = &Search::movePieceDown;
-	operatorList[1] = &Search::movePieceUp;
-	operatorList[2] = &Search::movePieceLeft;
-	operatorList[3] = &Search::movePieceRight;
+	std::vector<std::function<bool(Search&, gridi&)>> operatorList;
+	operatorList.push_back(&Search::movePieceDown);
+	operatorList.push_back(&Search::movePieceUp);
+	operatorList.push_back(&Search::movePieceLeft);
+	operatorList.push_back(&Search::movePieceRight);
 
 	problem.initialState = initialState;
 	problem.goalState = goalState;
 	problem.operators = operatorList;
-
-	// @TODO: delete operatorList (or just change to vector)
 }
 
 void Search::deleteEncounteredNodes()
@@ -27,7 +24,7 @@ void Search::deleteEncounteredNodes()
 	}
 }
 
-void Search::uniformCostSearch(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::function<bool(Search&, gridi&)>* inOperators)
+void Search::uniformCostSearch(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::vector<std::function<bool(Search&, gridi&)>> inOperators)
 {
 	if (outNodes.empty())
 	{
@@ -37,7 +34,7 @@ void Search::uniformCostSearch(std::priority_queue < Node*, std::vector<Node*>, 
 	Node* currentNode = outNodes.top();
 	exploredGrids.insert(currentNode->state);
 
-	for (auto i = 0; i < 4; ++i)	// @TODO: Hardcoded value of numOfOperators
+	for (auto i = 0; i < inOperators.size(); ++i)
 	{
 		Node* newNode = new Node(currentNode->cost + 1, currentNode->state);
 		newNode->parent = currentNode;
@@ -84,7 +81,7 @@ int Search::calculateNumMisplacedTiles(const gridi& grid)
 	return numMisplaced;
 }
 
-void Search::aStarMisplacedTile(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::function<bool(Search&, gridi&)>* inOperators)
+void Search::aStarMisplacedTile(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::vector<std::function<bool(Search&, gridi&)>> inOperators)
 {
 	if (outNodes.empty())
 	{
@@ -94,7 +91,7 @@ void Search::aStarMisplacedTile(std::priority_queue < Node*, std::vector<Node*>,
 	Node* currentNode = outNodes.top();
 	exploredGrids.insert(currentNode->state);
 
-	for (auto i = 0; i < 4; ++i)	// @TODO: Hardcoded value of numOfOperators
+	for (auto i = 0; i < inOperators.size(); ++i)
 	{
 		Node* newNode = new Node(currentNode->state);
 		newNode->parent = currentNode;
@@ -149,7 +146,7 @@ int Search::calculateManhattanDistance(const gridi& grid, const gridi& goal)
 	return totalDistance;
 }
 
-void Search::aStarManhattanDistance(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::function<bool(Search&, gridi&)>* inOperators)
+void Search::aStarManhattanDistance(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::vector<std::function<bool(Search&, gridi&)>> inOperators)
 {
 	if (outNodes.empty())
 	{
@@ -159,7 +156,7 @@ void Search::aStarManhattanDistance(std::priority_queue < Node*, std::vector<Nod
 	Node* currentNode = outNodes.top();
 	exploredGrids.insert(currentNode->state);
 
-	for (auto i = 0; i < 4; ++i)	// @TODO: Hardcoded value of numOfOperators
+	for (auto i = 0; i < inOperators.size(); ++i)
 	{
 		Node* newNode = new Node(currentNode->state);
 		newNode->parent = currentNode;
@@ -187,7 +184,7 @@ void Search::aStarManhattanDistance(std::priority_queue < Node*, std::vector<Nod
 }
 
 // General search algorithm suggested by Dr. Keogh
-bool Search::generalSearch(Problem problem, const std::function<void(Search&, std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >&, std::function<bool(Search&, gridi&)>*)>& queueingFunction)
+bool Search::generalSearch(Problem problem, const std::function<void(Search&, std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >&, std::vector<std::function<bool(Search&, gridi&)>>)>& queueingFunction)
 {
 	std::priority_queue<Node*, std::vector<Node*>, decltype(costComparisonLambda)> nodes(costComparisonLambda);
 

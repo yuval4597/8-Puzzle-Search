@@ -16,11 +16,11 @@ struct Problem
 {
 	gridi initialState;
 	gridi goalState;
-	std::function<bool(Search&, gridi&)>* operators;
+	std::vector<std::function<bool(Search&, gridi&)>> operators;
 
 	Problem() {}
 
-	Problem(gridi inInitialState, gridi inGoalState, std::function<bool(Search&, gridi&)>* inOperators) :
+	Problem(gridi inInitialState, gridi inGoalState, std::vector<std::function<bool(Search&, gridi&)>> inOperators) :
 		initialState(inInitialState),
 		goalState(inGoalState),
 		operators(inOperators)
@@ -75,6 +75,7 @@ private:
 	Problem problem;
 
 	std::vector<Node*> encounteredNodes;	// Need in order to deallocate memory
+											// Note: this is slowing down the algorithm a bit, optimization might be storing nodes instead of grids in exploredGrids and deallocating that way
 
 	void deleteEncounteredNodes();			// Deallocate memory from all nodes
 
@@ -82,15 +83,15 @@ private:
 	// Comparison lambda for prioritizing nodes
 	std::function<bool(Node*, Node*)> costComparisonLambda = [](Node* a, Node* b) { return a->cost > b->cost; };
 
-	void uniformCostSearch(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::function<bool(Search&, gridi&)>* inOperators);
+	void uniformCostSearch(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::vector<std::function<bool(Search&, gridi&)>> inOperators);
 
 	int calculateNumMisplacedTiles(const gridi& grid);
 
-	void aStarMisplacedTile(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::function<bool(Search&, gridi&)>* inOperators);
+	void aStarMisplacedTile(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::vector<std::function<bool(Search&, gridi&)>> inOperators);
 
-	void aStarManhattanDistance(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::function<bool(Search&, gridi&)>* inOperators);
+	void aStarManhattanDistance(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::vector<std::function<bool(Search&, gridi&)>> inOperators);
 
-	bool generalSearch(Problem problem, const std::function<void(Search&, std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >&, std::function<bool(Search&, gridi&)>*)>& queueingFunction);
+	bool generalSearch(Problem problem, const std::function<void(Search&, std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >&, std::vector<std::function<bool(Search&, gridi&)>>)>& queueingFunction);
 
 	/* Grid */
 	bool isGoalState(const gridi& grid, const gridi& goal);
