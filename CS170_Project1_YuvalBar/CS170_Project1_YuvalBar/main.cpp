@@ -107,7 +107,4 @@ int main()
 
 	Search search(initialGrid, solvedGrid);
 	search.runAstarMisplacedTileSearch();
-
-	int input = 0;
-	std::cin >> input;
 }
