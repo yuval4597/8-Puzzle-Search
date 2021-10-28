@@ -105,11 +105,8 @@ int main()
 
 	std::cout << std::endl;
 
-	if (1)
-	{
-		Search search(initialGrid, solvedGrid);
-		search.runAstarMisplacedTileSearch();
-	}
+	Search search(initialGrid, solvedGrid);
+	search.runAstarMisplacedTileSearch();
 
 	int input = 0;
 	std::cin >> input;
