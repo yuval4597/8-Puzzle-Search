@@ -108,7 +108,7 @@ int main()
 	if (1)
 	{
 		Search search(initialGrid, solvedGrid);
-		search.runAstarManhattanDistanceSearch();
+		search.runAstarMisplacedTileSearch();
 	}
 
 	int input = 0;

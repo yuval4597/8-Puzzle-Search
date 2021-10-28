@@ -85,7 +85,7 @@ private:
 
 	void uniformCostSearch(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::vector<std::function<bool(Search&, gridi&)>> inOperators);
 
-	int calculateNumMisplacedTiles(const gridi& grid);
+	int calculateNumMisplacedTiles(const gridi& grid, const gridi& goal);
 
 	void aStarMisplacedTile(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::vector<std::function<bool(Search&, gridi&)>> inOperators);
 

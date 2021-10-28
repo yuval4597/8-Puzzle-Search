@@ -54,24 +54,22 @@ void Search::uniformCostSearch(std::priority_queue < Node*, std::vector<Node*>, 
 	}
 }
 
-int Search::calculateNumMisplacedTiles(const gridi& grid)
+int Search::calculateNumMisplacedTiles(const gridi& grid, const gridi& goal)
 {
-	// @TODO: This should simply compare to the goal grid
 	int numMisplaced = 0;
 
 	for (int i = 0; i < grid.size(); ++i)
 	{
 		for (int j = 0; j < grid[0].size(); ++j)
 		{
+			// Not counting blank piece as misplaced tile
 			if (grid[i][j] == 0)
 			{
-				// Not counting blank piece as misplaced tile
 				continue;
 			}
 
-			// Check explicitly if the last piece is not the 0 (blank) piece, others are straightforward
-			if ((i == grid.size() - 1 && j == grid[0].size() - 1) ||
-				grid[i][j] != (i * grid.size()) + j + 1)
+			// Compare to goal state
+			if (grid[i][j] != goal[i][j])
 			{
 				++numMisplaced;
 			}
@@ -100,7 +98,7 @@ void Search::aStarMisplacedTile(std::priority_queue < Node*, std::vector<Node*>,
 
 		// Costs
 		int g = currentNode->cost + 1;
-		int h = calculateNumMisplacedTiles(newNode->state);
+		int h = calculateNumMisplacedTiles(newNode->state, problem.goalState);
 		int finalCost = h + g;
 
 		newNode->cost = finalCost;
