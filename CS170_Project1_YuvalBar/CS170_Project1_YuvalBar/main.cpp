@@ -106,5 +106,5 @@ int main()
 	std::cout << std::endl;
 
 	Search search(initialGrid, solvedGrid);
-	search.runAstarMisplacedTileSearch();
+	search.runAstarManhattanDistanceSearch();
 }

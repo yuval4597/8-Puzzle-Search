@@ -71,6 +71,8 @@ class Search
 public:
 	Search(gridi initialState, gridi goalState);
 
+	~Search();
+
 private:
 	Problem problem;
 

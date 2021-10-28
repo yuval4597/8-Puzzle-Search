@@ -15,6 +15,11 @@ Search::Search(gridi initialState, gridi goalState)
 	problem.operators = operatorList;
 }
 
+Search::~Search()
+{
+	deleteEncounteredNodes();
+}
+
 void Search::deleteEncounteredNodes()
 {
 	for (auto i = 0; i < encounteredNodes.size(); ++i)
