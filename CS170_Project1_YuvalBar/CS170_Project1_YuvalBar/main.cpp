@@ -105,11 +105,12 @@ int main()
 
 	std::cout << std::endl;
 
-	Search search(initialGrid, solvedGrid);
-	search.runAstarManhattanDistanceSearch();
+	if (1)
+	{
+		Search search(initialGrid, solvedGrid);
+		search.runAstarManhattanDistanceSearch();
+	}
 
 	int input = 0;
 	std::cin >> input;
-
-	// @TODO: Deallocate all resources (namely nodes)
 }

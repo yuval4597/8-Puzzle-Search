@@ -74,6 +74,10 @@ public:
 private:
 	Problem problem;
 
+	std::vector<Node*> encounteredNodes;	// Need in order to deallocate memory
+
+	void deleteEncounteredNodes();			// Deallocate memory from all nodes
+
 	/* Search */
 	// Comparison lambda for prioritizing nodes
 	std::function<bool(Node*, Node*)> costComparisonLambda = [](Node* a, Node* b) { return a->cost > b->cost; };

@@ -14,6 +14,17 @@ Search::Search(gridi initialState, gridi goalState)
 	problem.initialState = initialState;
 	problem.goalState = goalState;
 	problem.operators = operatorList;
+
+	// @TODO: delete operatorList (or just change to vector)
+}
+
+void Search::deleteEncounteredNodes()
+{
+	for (auto i = 0; i < encounteredNodes.size(); ++i)
+	{
+		delete encounteredNodes[i];
+		encounteredNodes[i] = nullptr;
+	}
 }
 
 void Search::uniformCostSearch(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::function<bool(Search&, gridi&)>* inOperators)
@@ -36,6 +47,7 @@ void Search::uniformCostSearch(std::priority_queue < Node*, std::vector<Node*>, 
 		if (!wasGridExplored(newNode->state))
 		{
 			outNodes.push(newNode);
+			encounteredNodes.push_back(newNode);
 		}
 		else
 		{
@@ -99,6 +111,7 @@ void Search::aStarMisplacedTile(std::priority_queue < Node*, std::vector<Node*>,
 		if (!wasGridExplored(newNode->state))
 		{
 			outNodes.push(newNode);
+			encounteredNodes.push_back(newNode);
 		}
 		else
 		{
@@ -163,6 +176,7 @@ void Search::aStarManhattanDistance(std::priority_queue < Node*, std::vector<Nod
 		if (!wasGridExplored(newNode->state))
 		{
 			outNodes.push(newNode);
+			encounteredNodes.push_back(newNode);
 		}
 		else
 		{
@@ -180,6 +194,7 @@ bool Search::generalSearch(Problem problem, const std::function<void(Search&, st
 	// Initialize priority queue with initial state
 	Node* initialNode = new Node(0, problem.initialState);
 	nodes.push(initialNode);
+	encounteredNodes.push_back(initialNode);
 
 	// Keep looping until hit one of the return statements (or run out of memory :P)
 	while (1)
@@ -187,6 +202,8 @@ bool Search::generalSearch(Problem problem, const std::function<void(Search&, st
 		if (nodes.empty())
 		{
 			std::cout << "FAILURE\n";
+
+			deleteEncounteredNodes();
 			return false;
 		}
 
@@ -206,6 +223,8 @@ bool Search::generalSearch(Problem problem, const std::function<void(Search&, st
 			}
 
 			std::cout << "Depth of " << depth << std::endl;
+
+			deleteEncounteredNodes();
 			return true;
 		}
 
