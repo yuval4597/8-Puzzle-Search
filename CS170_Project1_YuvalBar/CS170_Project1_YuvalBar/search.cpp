@@ -37,6 +37,11 @@ void Search::uniformCostSearch(std::priority_queue < Node*, std::vector<Node*>, 
 		{
 			outNodes.push(newNode);
 		}
+		else
+		{
+			// Grid was already explored, can delete this new node
+			delete newNode;
+		}
 	}
 }
 
@@ -95,6 +100,11 @@ void Search::aStarMisplacedTile(std::priority_queue < Node*, std::vector<Node*>,
 		{
 			outNodes.push(newNode);
 		}
+		else
+		{
+			// Grid was already explored, can delete this new node
+			delete newNode;
+		}
 	}
 }
 
@@ -106,6 +116,7 @@ int Search::calculateManhattanDistance(const gridi& grid, const gridi& goal)
 	{
 		for (auto j = 0; j < grid[0].size(); ++j)
 		{
+			// Ignoring 0 (blank) piece
 			if (grid[i][j] == 0)
 			{
 				continue;
@@ -153,8 +164,11 @@ void Search::aStarManhattanDistance(std::priority_queue < Node*, std::vector<Nod
 		{
 			outNodes.push(newNode);
 		}
-
-		// @TODO : Else delete unused new node (do in all queuing functions?)
+		else
+		{
+			// Grid was already explored, can delete this new node
+			delete newNode;
+		}
 	}
 }
 

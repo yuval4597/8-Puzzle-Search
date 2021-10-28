@@ -84,8 +84,6 @@ private:
 
 	void aStarMisplacedTile(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::function<bool(Search&, gridi&)>* inOperators);
 
-	int calculateManhattanDistance(const gridi& grid, const gridi& goal);
-
 	void aStarManhattanDistance(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::function<bool(Search&, gridi&)>* inOperators);
 
 	bool generalSearch(Problem problem, const std::function<void(Search&, std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >&, std::function<bool(Search&, gridi&)>*)>& queueingFunction);
@@ -99,7 +97,7 @@ private:
 
 	void printGrid(const gridi& grid);
 
-	void findPiece(int piece, int& outRow, int& outCol, const gridi& grid);
+	static void findPiece(int piece, int& outRow, int& outCol, const gridi& grid);
 
 	/* Operators */
 	// Function for moving piece down INTO the 0 spot
@@ -124,4 +122,6 @@ public:
 	void runAstarMisplacedTileSearch();
 
 	void runAstarManhattanDistanceSearch();
+
+	static int calculateManhattanDistance(const gridi& grid, const gridi& goal);
 };

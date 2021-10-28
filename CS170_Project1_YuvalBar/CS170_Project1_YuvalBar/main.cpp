@@ -85,9 +85,9 @@ int main()
 	};
 
 	gridi tempGrid = {
-		{8,1,5},
-		{6,7,4},
-		{2,3,0}
+		{1,2,3},
+		{4,5,6},
+		{7,8,0}
 	};
 
 	gridi initialGrid = testGrids[7];
@@ -107,6 +107,9 @@ int main()
 
 	Search search(initialGrid, solvedGrid);
 	search.runAstarManhattanDistanceSearch();
+
+	int input = 0;
+	std::cin >> input;
 
 	// @TODO: Deallocate all resources (namely nodes)
 }
