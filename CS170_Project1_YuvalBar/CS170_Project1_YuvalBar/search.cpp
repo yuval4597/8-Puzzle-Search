@@ -47,15 +47,16 @@ void Search::uniformCostSearch(std::priority_queue < Node*, std::vector<Node*>, 
 
 		inOperators[i](*this, newNode->state);
 
-		if (!wasGridExplored(newNode->state))
-		{
-			outNodes.push(newNode);
-			encounteredNodes.push_back(newNode);
-		}
-		else
+		if (wasGridExplored(newNode->state))
 		{
 			// Grid was already explored, can delete this new node
 			delete newNode;
+		}
+		else
+		{
+			// Add to nodes and encounteredNodes (for deallocation later)
+			outNodes.push(newNode);
+			encounteredNodes.push_back(newNode);
 		}
 	}
 }
@@ -102,23 +103,24 @@ void Search::aStarMisplacedTile(std::priority_queue < Node*, std::vector<Node*>,
 
 		inOperators[i](*this, newNode->state);
 
-		// Costs
-		int g = currentNode->gCost + 1;
-		int h = calculateNumMisplacedTiles(newNode->state, problem.goalState);
-		int finalCost = h + g;
-
-		newNode->gCost = g;
-		newNode->totalCost = finalCost;
-
-		if (!wasGridExplored(newNode->state))
-		{
-			outNodes.push(newNode);
-			encounteredNodes.push_back(newNode);
-		}
-		else
+		if (wasGridExplored(newNode->state))
 		{
 			// Grid was already explored, can delete this new node
 			delete newNode;
+		}
+		else
+		{
+			// Costs
+			int g = currentNode->gCost + 1;
+			int h = calculateNumMisplacedTiles(newNode->state, problem.goalState);
+			int finalCost = h + g;
+
+			newNode->gCost = g;
+			newNode->totalCost = finalCost;
+
+			// Add to nodes and encounteredNodes (for deallocation later)
+			outNodes.push(newNode);
+			encounteredNodes.push_back(newNode);
 		}
 	}
 }
@@ -168,23 +170,24 @@ void Search::aStarManhattanDistance(std::priority_queue < Node*, std::vector<Nod
 
 		inOperators[i](*this, newNode->state);
 
-		// Costs
-		int g = currentNode->gCost + 1;
-		int h = calculateManhattanDistance(newNode->state, problem.goalState);
-		int finalCost = h + g;
-
-		newNode->gCost = g;
-		newNode->totalCost = finalCost;
-
-		if (!wasGridExplored(newNode->state))
-		{
-			outNodes.push(newNode);
-			encounteredNodes.push_back(newNode);
-		}
-		else
+		if (wasGridExplored(newNode->state))
 		{
 			// Grid was already explored, can delete this new node
 			delete newNode;
+		}
+		else
+		{
+			// Costs
+			int g = currentNode->gCost + 1;
+			int h = calculateManhattanDistance(newNode->state, problem.goalState);
+			int finalCost = h + g;
+
+			newNode->gCost = g;
+			newNode->totalCost = finalCost;
+
+			// Add to nodes and encounteredNodes (for deallocation later)
+			outNodes.push(newNode);
+			encounteredNodes.push_back(newNode);
 		}
 	}
 }
