@@ -3,6 +3,7 @@
 #include "search.h"
 
 #include <iostream>
+#include <chrono>
 
 std::vector<gridi> testGrids = {
 	{
@@ -57,11 +58,13 @@ std::vector<gridi> testGrids = {
 
 int main()
 {
+	bool shouldRunPerformanceTests = false;
+
 	char c;
-	std::cout << "Would you like to enter an initial state yourself? (y/n) ";
+	std::cout << "Would you like to enter an initial state yourself? (y/n) ";	// Secret option 'p' for running performance tests
 	std::cin >> c;
 
-	while (c != 'y' && c != 'n')
+	while (c != 'y' && c != 'n' && c != 'p')
 	{
 		std::cout << "Invalid input. Would you like to enter an initial state yourself? (y/n) ";
 		std::cin >> c;
@@ -83,7 +86,7 @@ int main()
 		std::cout << "Running with default initial state...\n\n";
 		initialGrid = tempGrid;
 	}
-	else
+	else if (c == 'y')
 	{
 		std::cout << "Enter n (where grid is nxn): ";
 		std::cin >> n;
@@ -106,68 +109,154 @@ int main()
 			initialGrid.push_back(tempRow);
 		}
 	}
-
-	gridi solvedGrid(n, std::vector<int>(n));
-
-    std::cout << "Solved grid:\n";
-
-	for (auto i = 0; i < n; ++i)
+	else // c == 'p'
 	{
-		for (auto j = 0; j < n; ++j)
-		{
-            if (i == n - 1 && j == n - 1)
-            {
-                solvedGrid[i][j] = 0;
-            }
-            else
-            {
-                solvedGrid[i][j] = (i * n) + j + 1;
-            }
-			
-            std::cout << solvedGrid[i][j] << '\t';
-		}
-        std::cout << std::endl;
+		shouldRunPerformanceTests = true;
+		n = 3;
 	}
 
-    std::cout << std::endl;
-
-	std::cout << "initial grid:\n";
-
-	for (unsigned int i = 0; i < initialGrid.size(); ++i)
+	if (shouldRunPerformanceTests)
 	{
-		for (unsigned int j = 0; j < initialGrid[0].size(); ++j)
-		{
-			std::cout << initialGrid[i][j] << '\t';
-		}
-		std::cout << std::endl;
-	}
-
-	std::cout << std::endl;
-
-	Search search(initialGrid, solvedGrid);
-	
-	int queueingFnType = 0;
-	std::cout << "Solve using\n1. Uniform Cost Search\n2. A* Misplaced Tile\n3. A* Manhattan Distance\nYour choice: ";
-	std::cin >> queueingFnType;
-
-	while (queueingFnType < 1 || queueingFnType > 3)
-	{
-		std::cout << "Invalid input. Solve using\n1. Uniform Cost Search\n2. A* Misplaced Tile\n3. A* Manhattan Distance\nYour choice: ";
+		int queueingFnType = 0;
+		std::cout << "Run performance test using\n1. Uniform Cost Search\n2. A* Misplaced Tile\n3. A* Manhattan Distance\nYour choice: ";
 		std::cin >> queueingFnType;
-	}
 
-	switch (queueingFnType)
+		while (queueingFnType < 1 || queueingFnType > 3)
+		{
+			std::cout << "Invalid input. Run performance test using\n1. Uniform Cost Search\n2. A* Misplaced Tile\n3. A* Manhattan Distance\nYour choice: ";
+			std::cin >> queueingFnType;
+		}
+
+		// Go through all test grids
+		for (auto i = 0; i < testGrids.size(); ++i)
+		{
+			initialGrid = testGrids[i];
+			gridi solvedGrid(n, std::vector<int>(n));
+
+			std::cout << "Solved grid:\n";
+
+			for (auto i = 0; i < n; ++i)
+			{
+				for (auto j = 0; j < n; ++j)
+				{
+					if (i == n - 1 && j == n - 1)
+					{
+						solvedGrid[i][j] = 0;
+					}
+					else
+					{
+						solvedGrid[i][j] = (i * n) + j + 1;
+					}
+
+					std::cout << solvedGrid[i][j] << '\t';
+				}
+				std::cout << std::endl;
+			}
+
+			std::cout << std::endl;
+
+			std::cout << "initial grid:\n";
+
+			for (unsigned int i = 0; i < initialGrid.size(); ++i)
+			{
+				for (unsigned int j = 0; j < initialGrid[0].size(); ++j)
+				{
+					std::cout << initialGrid[i][j] << '\t';
+				}
+				std::cout << std::endl;
+			}
+
+			std::cout << std::endl;
+
+			Search search(initialGrid, solvedGrid);
+			
+			auto startTime = std::chrono::system_clock::now();
+			switch (queueingFnType)
+			{
+			case 1:
+				search.runUniformCostSearch();
+				break;
+			case 2:
+				search.runAstarMisplacedTileSearch();
+				break;
+			case 3:
+				search.runAstarManhattanDistanceSearch();
+				break;
+			default:
+				std::cout << "Something went wrong :(\n";
+			}
+
+			auto endTime = std::chrono::system_clock::now();
+			auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
+			std::cout << "Took " << elapsedTime.count() << " milliseconds to find a solution.\n\n";
+
+			
+		}
+	}
+	else
 	{
-	case 1:
-		search.runUniformCostSearch();
-		break;
-	case 2:
-		search.runAstarMisplacedTileSearch();
-		break;
-	case 3:
-		search.runAstarManhattanDistanceSearch();
-		break;
-	default:
-		std::cout << "Something went wrong :(\n";
+		gridi solvedGrid(n, std::vector<int>(n));
+
+		std::cout << "Solved grid:\n";
+
+		for (auto i = 0; i < n; ++i)
+		{
+			for (auto j = 0; j < n; ++j)
+			{
+				if (i == n - 1 && j == n - 1)
+				{
+					solvedGrid[i][j] = 0;
+				}
+				else
+				{
+					solvedGrid[i][j] = (i * n) + j + 1;
+				}
+
+				std::cout << solvedGrid[i][j] << '\t';
+			}
+			std::cout << std::endl;
+		}
+
+		std::cout << std::endl;
+
+		std::cout << "initial grid:\n";
+
+		for (unsigned int i = 0; i < initialGrid.size(); ++i)
+		{
+			for (unsigned int j = 0; j < initialGrid[0].size(); ++j)
+			{
+				std::cout << initialGrid[i][j] << '\t';
+			}
+			std::cout << std::endl;
+		}
+
+		std::cout << std::endl;
+
+		Search search(initialGrid, solvedGrid);
+
+		int queueingFnType = 0;
+		std::cout << "Solve using\n1. Uniform Cost Search\n2. A* Misplaced Tile\n3. A* Manhattan Distance\nYour choice: ";
+		std::cin >> queueingFnType;
+
+		while (queueingFnType < 1 || queueingFnType > 3)
+		{
+			std::cout << "Invalid input. Solve using\n1. Uniform Cost Search\n2. A* Misplaced Tile\n3. A* Manhattan Distance\nYour choice: ";
+			std::cin >> queueingFnType;
+		}
+
+		switch (queueingFnType)
+		{
+		case 1:
+			search.runUniformCostSearch();
+			break;
+		case 2:
+			search.runAstarMisplacedTileSearch();
+			break;
+		case 3:
+			search.runAstarManhattanDistanceSearch();
+			break;
+		default:
+			std::cout << "Something went wrong :(\n";
+		}
 	}
 }
