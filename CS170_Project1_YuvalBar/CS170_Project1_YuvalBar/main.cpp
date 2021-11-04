@@ -4,10 +4,108 @@
 
 #include <iostream>
 
+std::vector<gridi> testGrids = {
+	{
+		// Depth 0
+		{1,2,3},
+		{4,5,6},
+		{7,8,0}
+	},
+	{
+		// Depth 2
+		{1,2,3},
+		{4,5,6},
+		{0,7,8}
+	},
+	{
+		// Depth 4
+		{1,2,3},
+		{5,0,6},
+		{4,7,8}
+	},
+	{
+		// Depth 8
+		{1,3,6},
+		{5,0,2},
+		{4,7,8}
+	},
+	{
+		// Depth 12
+		{1,3,6},
+		{5,0,7},
+		{4,8,2}
+	},
+	{
+		// Depth 16
+		{1,6,7},
+		{5,0,3},
+		{4,8,2}
+	},
+	{
+		// Depth 20
+		{7,1,2},
+		{4,8,5},
+		{6,3,0}
+	},
+	{
+		// Depth 24
+		{0,7,2},
+		{4,6,1},
+		{3,5,8}
+	},
+};
+
 int main()
 {
-    // n is the number of rows/columns (must be a square grid)
-    const int n = 3;
+	char c;
+	std::cout << "Would you like to enter an initial state yourself? (y/n) ";
+	std::cin >> c;
+
+	while (c != 'y' && c != 'n')
+	{
+		std::cout << "Invalid input. Would you like to enter an initial state yourself? (y/n) ";
+		std::cin >> c;
+	}
+
+	// n is the number of rows/columns (must be a square grid)
+	int n = 3;
+
+	gridi tempGrid = {
+		{3,1,8},
+		{5,6,4},
+		{2,7,0}
+	};
+
+	gridi initialGrid;
+
+	if (c == 'n')
+	{
+		std::cout << "Running with default initial state...\n\n";
+		initialGrid = tempGrid;
+	}
+	else
+	{
+		std::cout << "Enter n (where grid is nxn): ";
+		std::cin >> n;
+		while (n <= 0)
+		{
+			std::cout << "Invalid input. Enter n (where grid is nxn): ";
+			std::cin >> n;
+		}
+
+		std::cout << "Enter grid:\n";
+		for (auto i = 0; i < n; ++i)
+		{
+			std::vector<int> tempRow;
+			for (auto j = 0; j < n; ++j)
+			{
+				int input;
+				std::cin >> input;
+				tempRow.push_back(input);
+			}
+			initialGrid.push_back(tempRow);
+		}
+	}
 
 	gridi solvedGrid(n, std::vector<int>(n));
 
@@ -33,65 +131,6 @@ int main()
 
     std::cout << std::endl;
 
-	std::vector<gridi> testGrids = {
-		{
-			// Depth 0
-			{1,2,3},
-			{4,5,6},
-			{7,8,0}
-		},
-		{
-			// Depth 2
-			{1,2,3},
-			{4,5,6},
-			{0,7,8}
-		},
-		{
-			// Depth 4
-			{1,2,3},
-			{5,0,6},
-			{4,7,8}
-		},
-		{
-			// Depth 8
-			{1,3,6},
-			{5,0,2},
-			{4,7,8}
-		},
-		{
-			// Depth 12
-			{1,3,6},
-			{5,0,7},
-			{4,8,2}
-		},
-		{
-			// Depth 16
-			{1,6,7},
-			{5,0,3},
-			{4,8,2}
-		},
-		{
-			// Depth 20
-			{7,1,2},
-			{4,8,5},
-			{6,3,0}
-		},
-		{
-			// Depth 24
-			{0,7,2},
-			{4,6,1},
-			{3,5,8}
-		},
-	};
-
-	gridi tempGrid = {
-		{1,2,3},
-		{4,5,6},
-		{7,8,0}
-	};
-
-	gridi initialGrid = testGrids[7];
-
 	std::cout << "initial grid:\n";
 
 	for (unsigned int i = 0; i < initialGrid.size(); ++i)
@@ -106,5 +145,29 @@ int main()
 	std::cout << std::endl;
 
 	Search search(initialGrid, solvedGrid);
-	search.runAstarManhattanDistanceSearch();
+	
+	int queueingFnType = 0;
+	std::cout << "Solve using\n1. Uniform Cost Search\n2. A* Misplaced Tile\n3. A* Manhattan Distance\nYour choice: ";
+	std::cin >> queueingFnType;
+
+	while (queueingFnType < 1 || queueingFnType > 3)
+	{
+		std::cout << "Invalid input. Solve using\n1. Uniform Cost Search\n2. A* Misplaced Tile\n3. A* Manhattan Distance\nYour choice: ";
+		std::cin >> queueingFnType;
+	}
+
+	switch (queueingFnType)
+	{
+	case 1:
+		search.runUniformCostSearch();
+		break;
+	case 2:
+		search.runAstarMisplacedTileSearch();
+		break;
+	case 3:
+		search.runAstarManhattanDistanceSearch();
+		break;
+	default:
+		std::cout << "Something went wrong :(\n";
+	}
 }
