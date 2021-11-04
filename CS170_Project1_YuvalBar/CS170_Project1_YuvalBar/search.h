@@ -31,16 +31,17 @@ struct Problem
 struct Node
 {
 	gridi state;
-	int cost = 0;
+	int totalCost = 0;	// Sum of g(n) (cost of moves so far) and h(n) (determined by heuristic)
+	int gCost = 0;
 	Node* parent = nullptr;
 
 	Node(int inCost, gridi inState) :
-		cost(inCost),
+		totalCost(inCost),
 		state(inState)
 	{}
 
 	Node(gridi inState) :
-		cost(0),
+		totalCost(0),
 		state(inState)
 	{}
 };
@@ -83,7 +84,7 @@ private:
 
 	/* Search */
 	// Comparison lambda for prioritizing nodes
-	std::function<bool(Node*, Node*)> costComparisonLambda = [](Node* a, Node* b) { return a->cost > b->cost; };
+	std::function<bool(Node*, Node*)> costComparisonLambda = [](Node* a, Node* b) { return a->totalCost > b->totalCost; };
 
 	void uniformCostSearch(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::vector<std::function<bool(Search&, gridi&)>> inOperators);
 

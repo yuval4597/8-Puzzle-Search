@@ -41,7 +41,8 @@ void Search::uniformCostSearch(std::priority_queue < Node*, std::vector<Node*>, 
 
 	for (auto i = 0; i < inOperators.size(); ++i)
 	{
-		Node* newNode = new Node(currentNode->cost + 1, currentNode->state);
+		// Here we can just add one to the totalCost when storing the newNode's cost since h(n) is always 0
+		Node* newNode = new Node(currentNode->totalCost + 1, currentNode->state);
 		newNode->parent = currentNode;
 
 		inOperators[i](*this, newNode->state);
@@ -102,11 +103,12 @@ void Search::aStarMisplacedTile(std::priority_queue < Node*, std::vector<Node*>,
 		inOperators[i](*this, newNode->state);
 
 		// Costs
-		int g = currentNode->cost + 1;
+		int g = currentNode->gCost + 1;
 		int h = calculateNumMisplacedTiles(newNode->state, problem.goalState);
 		int finalCost = h + g;
 
-		newNode->cost = finalCost;
+		newNode->gCost = g;
+		newNode->totalCost = finalCost;
 
 		if (!wasGridExplored(newNode->state))
 		{
@@ -167,11 +169,12 @@ void Search::aStarManhattanDistance(std::priority_queue < Node*, std::vector<Nod
 		inOperators[i](*this, newNode->state);
 
 		// Costs
-		int g = currentNode->cost + 1;
+		int g = currentNode->gCost + 1;
 		int h = calculateManhattanDistance(newNode->state, problem.goalState);
 		int finalCost = h + g;
 
-		newNode->cost = finalCost;
+		newNode->gCost = g;
+		newNode->totalCost = finalCost;
 
 		if (!wasGridExplored(newNode->state))
 		{
