@@ -22,11 +22,21 @@ Search::~Search()
 
 void Search::deleteEncounteredNodes()
 {
+	if (wereEncounteredNodesDeleted)
+	{
+		return;
+	}
+
+	numEncounteredNodes = encounteredNodes.size();
+
 	for (auto i = 0; i < encounteredNodes.size(); ++i)
 	{
 		delete encounteredNodes[i];
 		encounteredNodes[i] = nullptr;
 	}
+
+	encounteredNodes.resize(8);
+	wereEncounteredNodesDeleted = true;
 }
 
 void Search::uniformCostSearch(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::vector<std::function<bool(Search&, gridi&)>> inOperators)
@@ -151,6 +161,11 @@ int Search::calculateManhattanDistance(const gridi& grid, const gridi& goal)
 	}
 
 	return totalDistance;
+}
+
+int Search::getNumEncounteredNodes() const
+{
+	return numEncounteredNodes;
 }
 
 void Search::aStarManhattanDistance(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::vector<std::function<bool(Search&, gridi&)>> inOperators)

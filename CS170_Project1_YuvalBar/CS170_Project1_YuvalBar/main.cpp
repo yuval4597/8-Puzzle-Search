@@ -186,11 +186,15 @@ int main()
 				std::cout << "Something went wrong :(\n";
 			}
 
+			std::cout << "\nPerformance:\n";
+
+			// Time
 			auto endTime = std::chrono::system_clock::now();
 			auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
-			std::cout << "Took " << elapsedTime.count() << " milliseconds to find a solution.\n\n";
+			std::cout << "Took " << elapsedTime.count() << " milliseconds to find a solution.\n";
 
-			
+			// Space (num of nodes)
+			std::cout << "Encountered " << search.getNumEncounteredNodes() << " nodes to reach this solution.\n\n";
 		}
 	}
 	else

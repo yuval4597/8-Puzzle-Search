@@ -80,6 +80,8 @@ private:
 	std::vector<Node*> encounteredNodes;	// Need in order to deallocate memory
 											// Note: this is slowing down the algorithm a bit, optimization might be storing nodes instead of grids in exploredGrids and deallocating that way
 
+
+	bool wereEncounteredNodesDeleted = false;
 	void deleteEncounteredNodes();			// Deallocate memory from all nodes
 
 	/* Search */
@@ -124,6 +126,9 @@ private:
 	// Returns false if the operation was unsuccessful
 	bool movePieceRight(gridi& grid);
 
+	// For performance tracking
+	int numEncounteredNodes = 0;
+
 public:
 	void runUniformCostSearch();
 
@@ -132,4 +137,7 @@ public:
 	void runAstarManhattanDistanceSearch();
 
 	static int calculateManhattanDistance(const gridi& grid, const gridi& goal);
+
+	// Returns the total number of nodes encountered after running one of the search algorithms
+	int getNumEncounteredNodes() const;
 };
