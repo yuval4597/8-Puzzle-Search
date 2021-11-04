@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <chrono>
+#include <fstream>
 
 std::vector<gridi> testGrids = {
 	{
@@ -127,6 +128,10 @@ int main()
 			std::cin >> queueingFnType;
 		}
 
+		// Output files
+		std::ofstream timefile("TimeData.txt");
+		std::ofstream spacefile("SpaceData.txt");
+
 		// Go through all test grids
 		for (auto i = 0; i < testGrids.size(); ++i)
 		{
@@ -195,6 +200,26 @@ int main()
 
 			// Space (num of nodes)
 			std::cout << "Encountered " << search.getNumEncounteredNodes() << " nodes to reach this solution.\n\n";
+
+			if (timefile.is_open())
+			{
+				timefile << elapsedTime.count() << ", ";
+			}
+
+			if (spacefile.is_open())
+			{
+				spacefile << search.getNumEncounteredNodes() << ", ";
+			}
+		}
+
+		if (timefile.is_open())
+		{
+			timefile.close();
+		}
+
+		if (spacefile.is_open())
+		{
+			spacefile.close();
 		}
 	}
 	else
