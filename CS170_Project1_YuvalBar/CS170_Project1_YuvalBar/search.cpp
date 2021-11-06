@@ -210,7 +210,7 @@ void Search::aStarManhattanDistance(std::priority_queue < Node*, std::vector<Nod
 }
 
 // General search algorithm suggested by Dr. Keogh
-bool Search::generalSearch(Problem problem, const std::function<void(Search&, std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >&, std::vector<std::function<bool(Search&, gridi&)>>)>& queueingFunction)
+bool Search::generalSearch(Problem problem, const std::function<void(Search&, std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >&, std::vector<std::function<bool(Search&, gridi&)>>)>& queuingFunction)
 {
 	std::priority_queue<Node*, std::vector<Node*>, decltype(costComparisonLambda)> nodes(costComparisonLambda);
 
@@ -251,7 +251,7 @@ bool Search::generalSearch(Problem problem, const std::function<void(Search&, st
 			return true;
 		}
 
-		queueingFunction(*this, nodes, problem.operators);
+		queuingFunction(*this, nodes, problem.operators);
 		nodes.pop();
 	}
 }

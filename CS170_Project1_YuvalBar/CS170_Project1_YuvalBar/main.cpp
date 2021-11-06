@@ -118,14 +118,14 @@ int main()
 
 	if (shouldRunPerformanceTests)
 	{
-		int queueingFnType = 0;
+		int queuingFnType = 0;
 		std::cout << "Run performance test using\n1. Uniform Cost Search\n2. A* Misplaced Tile\n3. A* Manhattan Distance\nYour choice: ";
-		std::cin >> queueingFnType;
+		std::cin >> queuingFnType;
 
-		while (queueingFnType < 1 || queueingFnType > 3)
+		while (queuingFnType < 1 || queuingFnType > 3)
 		{
 			std::cout << "Invalid input. Run performance test using\n1. Uniform Cost Search\n2. A* Misplaced Tile\n3. A* Manhattan Distance\nYour choice: ";
-			std::cin >> queueingFnType;
+			std::cin >> queuingFnType;
 		}
 
 		// Output files
@@ -176,7 +176,7 @@ int main()
 			Search search(initialGrid, solvedGrid);
 			
 			auto startTime = std::chrono::system_clock::now();
-			switch (queueingFnType)
+			switch (queuingFnType)
 			{
 			case 1:
 				search.runUniformCostSearch();
@@ -263,17 +263,18 @@ int main()
 
 		Search search(initialGrid, solvedGrid);
 
-		int queueingFnType = 0;
+		int queuingFnType = 0;
 		std::cout << "Solve using\n1. Uniform Cost Search\n2. A* Misplaced Tile\n3. A* Manhattan Distance\nYour choice: ";
-		std::cin >> queueingFnType;
+		std::cin >> queuingFnType;
 
-		while (queueingFnType < 1 || queueingFnType > 3)
+		while (queuingFnType < 1 || queuingFnType > 3)
 		{
 			std::cout << "Invalid input. Solve using\n1. Uniform Cost Search\n2. A* Misplaced Tile\n3. A* Manhattan Distance\nYour choice: ";
-			std::cin >> queueingFnType;
+			std::cin >> queuingFnType;
 		}
 
-		switch (queueingFnType)
+		auto startTime = std::chrono::system_clock::now();
+		switch (queuingFnType)
 		{
 		case 1:
 			search.runUniformCostSearch();
@@ -287,5 +288,15 @@ int main()
 		default:
 			std::cout << "Something went wrong :(\n";
 		}
+
+		std::cout << "\nPerformance:\n";
+
+		// Time
+		auto endTime = std::chrono::system_clock::now();
+		auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
+		std::cout << "Took " << elapsedTime.count() << " milliseconds to find a solution.\n";
+
+		// Space (num of nodes)
+		std::cout << "Encountered " << search.getNumEncounteredNodes() << " nodes to reach this solution.\n\n";
 	}
 }

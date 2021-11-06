@@ -98,7 +98,7 @@ private:
 
 	void aStarManhattanDistance(std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >& outNodes, std::vector<std::function<bool(Search&, gridi&)>> inOperators);
 
-	bool generalSearch(Problem problem, const std::function<void(Search&, std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >&, std::vector<std::function<bool(Search&, gridi&)>>)>& queueingFunction);
+	bool generalSearch(Problem problem, const std::function<void(Search&, std::priority_queue < Node*, std::vector<Node*>, decltype(costComparisonLambda) >&, std::vector<std::function<bool(Search&, gridi&)>>)>& queuingFunction);
 
 	/* Grid */
 	bool isGoalState(const gridi& grid, const gridi& goal);
