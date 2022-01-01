@@ -1,2 +1,2 @@
-# Solving the 8-Puzzle using Search (CS170 Project 1)
- Project 1 for CS170 taken in Fall 2021.
+# Solving the 8-Puzzle using Search
+Program using Uniform Cost Search, and A* with two heuristics (Misplaced Tile, and Manhattan Distance) in order to solve the 8-puzzle.
